@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HortaLab Escola — versão enxuta com montagem isométrica da horta.">
+  <meta name="theme-color" content="#1F5D4C">
+  <title>HortaLab Escola — layout isométrico</title>
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/v2.css">
+  <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body class="v2-body">
+  <a class="skip-link" href="#app">Pular para o planejador</a>
+  <header class="v2-header">
+    <div class="v2-shell v2-header-inner">
+      <a class="brand" href="index-v2.html" aria-label="HortaLab Escola — versão enxuta">
+        <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M24 41V20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <path d="M23 24C12 24 7 17 7 8c10 0 16 5 16 16Z" fill="currentColor" opacity=".78"/>
+          <path d="M25 19C26 9 33 5 41 6c0 9-6 14-16 13Z" fill="currentColor"/>
+        </svg>
+        <span><strong>HortaLab</strong> Escola</span>
+      </a>
+      <nav class="v2-header-nav" aria-label="Atalhos">
+        <a href="index.html">Versão atual</a>
+        <a href="cartilha.html">Cartilha</a>
+        <button class="button button-quiet button-small" id="v2ResetTop" type="button">Reiniciar</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" class="v2-shell v2-main">
+    <section class="v2-hero" aria-labelledby="v2-title">
+      <div>
+        <p class="section-number">Versão enxuta</p>
+        <h1 id="v2-title">Monte a horta antes de implantá-la.</h1>
+        <p>Escolha uma escala, ajuste os componentes e veja o espaço ganhar forma em uma perspectiva isométrica.</p>
+      </div>
+      <div class="v2-hero-note"><strong>Sem cadastro.</strong><span>As escolhas ficam neste dispositivo.</span></div>
+    </section>
+
+    <nav class="v2-progress" aria-label="Etapas da versão enxuta">
+      <ol id="v2Progress">
+        <li><button type="button" data-v2-step="1"><span>1</span>Essencial</button></li>
+        <li><button type="button" data-v2-step="2"><span>2</span>Escala</button></li>
+        <li><button type="button" data-v2-step="3"><span>3</span>Composição</button></li>
+        <li><button type="button" data-v2-step="4"><span>4</span>Layout</button></li>
+        <li><button type="button" data-v2-step="5"><span>5</span>Atividades</button></li>
+        <li><button type="button" data-v2-step="6"><span>6</span>Resumo</button></li>
+      </ol>
+    </nav>
+
+    <section class="v2-workspace" aria-live="polite">
+      <section class="v2-step" data-v2-panel="1" aria-labelledby="v2-step-1-title">
+        <div class="v2-step-heading"><div><p class="section-number">1 de 6</p><h2 id="v2-step-1-title">O essencial para começar</h2></div><p>Quatro respostas bastam para orientar a primeira escala.</p></div>
+        <form id="v2Essentials" class="v2-form">
+          <label class="field"><span>Finalidade principal</span><select name="purpose"><option value="learning">Aprendizagem interdisciplinar</option><option value="environment">Educação ambiental</option><option value="community">Mobilização comunitária</option><option value="experiment">Projeto-piloto</option></select></label>
+          <label class="field"><span>Área disponível aproximada</span><span class="input-suffix"><input name="availableArea" type="number" min="1" max="500" step="0.5" inputmode="decimal" value="25"><span>m²</span></span></label>
+          <label class="field"><span>Água</span><select name="water"><option value="regular">Regular e próxima</option><option value="limited">Limitada ou distante</option><option value="seasonal">Sazonal</option><option value="unknown">Precisa ser confirmada</option></select></label>
+          <label class="field"><span>Pessoas que cuidarão</span><span class="input-suffix"><input name="responsibles" type="number" min="0" max="50" step="1" inputmode="numeric" value="2"><span>pessoas</span></span></label>
+        </form>
+        <div class="v2-step-actions"><span class="v2-hint">Você pode revisar essas respostas depois.</span><button class="button button-primary" type="button" data-v2-next>Escolher escala</button></div>
+      </section>
+
+      <section class="v2-step" data-v2-panel="2" aria-labelledby="v2-step-2-title" hidden>
+        <div class="v2-step-heading"><div><p class="section-number">2 de 6</p><h2 id="v2-step-2-title">Escolha uma escala possível</h2></div><p>O tamanho é uma hipótese de trabalho — não uma recomendação universal.</p></div>
+        <div id="v2Scenarios" class="v2-scenarios"></div>
+        <div id="v2ScenarioHint" class="v2-inline-note" role="status"></div>
+        <div class="v2-step-actions"><button class="button button-quiet" type="button" data-v2-prev>Voltar</button><button class="button button-primary" type="button" data-v2-next>Montar composição</button></div>
+      </section>
+
+      <section class="v2-step" data-v2-panel="3" aria-labelledby="v2-step-3-title" hidden>
+        <div class="v2-step-heading"><div><p class="section-number">3 de 6</p><h2 id="v2-step-3-title">Composição</h2></div><p>Adicione o que precisa existir no plano. A área nunca pode ultrapassar a escala escolhida.</p></div>
+        <div class="v2-composition-grid">
+          <aside class="v2-panel" aria-labelledby="v2-library-title"><div class="v2-panel-heading"><h3 id="v2-library-title">Adicionar componente</h3><span>Clique para incluir</span></div><div id="v2Library" class="v2-library"></div></aside>
+          <div class="v2-panel v2-composition-panel"><div class="v2-area-head"><div><strong id="v2CompositionScenario">Cenário</strong><span id="v2CompositionArea">0 m² de 0 m²</span></div><div class="v2-area-meter"><span id="v2CompositionMeter"></span></div></div><div id="v2ComponentList" class="v2-component-list" aria-label="Componentes escolhidos"></div><div id="v2CompositionMessage" class="v2-inline-note" role="status"></div></div>
+        </div>
+        <div class="v2-step-actions"><button class="button button-quiet" type="button" data-v2-prev>Voltar</button><button class="button button-primary" type="button" data-v2-next>Ver layout</button></div>
+      </section>
+
+      <section class="v2-step" data-v2-panel="4" aria-labelledby="v2-step-4-title" hidden>
+        <div class="v2-step-heading"><div><p class="section-number">4 de 6</p><h2 id="v2-step-4-title">Layout isométrico</h2></div><p>Uma leitura espacial para conversar sobre circulação, zonas e cuidado. Não é uma planta técnica.</p></div>
+        <div class="v2-layout-shell">
+          <aside class="v2-layout-sidebar v2-panel" aria-labelledby="v2-layout-title">
+            <div class="v2-panel-heading"><h3 id="v2-layout-title">Seu cenário</h3><button class="v2-text-button" type="button" data-v2-step="2">Trocar</button></div>
+            <div class="v2-scenario-mini"><strong id="v2LayoutScenario">Horta compacta</strong><span id="v2LayoutArea">25 m²</span></div>
+            <div class="v2-layout-meter"><div class="v2-meter-label"><span>Uso da área</span><strong id="v2LayoutPercent">0%</strong></div><div class="v2-area-meter"><span id="v2LayoutMeter"></span></div></div>
+            <div class="v2-panel-heading v2-panel-heading-spaced"><h3>Componentes</h3><span id="v2LayoutCount">0 itens</span></div>
+            <ul id="v2LayoutList" class="v2-layout-list"></ul>
+            <div class="v2-selected-actions"><strong id="v2SelectedTitle">Selecione uma zona</strong><span id="v2SelectedHelp">Clique em um item da cena ou da lista.</span><div class="v2-nudge-actions" aria-label="Reposicionar zona"><button type="button" data-v2-nudge="ArrowUp" aria-label="Mover para cima">↑</button><button type="button" data-v2-nudge="ArrowLeft" aria-label="Mover para a esquerda">←</button><button type="button" data-v2-nudge="ArrowDown" aria-label="Mover para baixo">↓</button><button type="button" data-v2-nudge="ArrowRight" aria-label="Mover para a direita">→</button></div><div><button class="button button-danger button-small" id="v2RemoveSelected" type="button" disabled>Remover</button></div></div>
+          </aside>
+          <div class="v2-iso-stage v2-panel">
+            <div class="v2-stage-toolbar"><div><strong>Vista de jogo</strong><span>Use Tab e Enter para navegar pelos itens.</span></div><div class="v2-stage-actions"><button type="button" class="icon-button" id="v2Rotate" aria-label="Girar vista">↻</button><button type="button" class="icon-button" id="v2ZoomOut" aria-label="Diminuir zoom">−</button><button type="button" class="icon-button" id="v2ZoomIn" aria-label="Aumentar zoom">+</button></div></div>
+            <div class="v2-svg-wrap"><svg id="v2IsoCanvas" viewBox="0 0 760 560" role="img" aria-labelledby="v2IsoTitle v2IsoDesc"><title id="v2IsoTitle">Montagem isométrica da horta</title><desc id="v2IsoDesc">Representação espacial dos componentes escolhidos.</desc></svg></div>
+            <div class="v2-stage-legend"><span><i class="legend-dot legend-bed"></i>Produção</span><span><i class="legend-dot legend-path"></i>Circulação</span><span><i class="legend-dot legend-support"></i>Apoio</span><span><i class="legend-dot legend-learning"></i>Aprendizagem</span></div>
+          </div>
+        </div>
+        <div class="v2-step-actions"><button class="button button-quiet" type="button" data-v2-prev>Voltar</button><button class="button button-primary" type="button" data-v2-next>Planejar atividades</button></div>
+      </section>
+
+      <section class="v2-step" data-v2-panel="5" aria-labelledby="v2-step-5-title" hidden>
+        <div class="v2-step-heading"><div><p class="section-number">5 de 6</p><h2 id="v2-step-5-title">Atividades que cabem no plano</h2></div><p>Escolha poucas experiências que a equipe consiga acompanhar.</p></div>
+        <div id="v2Activities" class="v2-activities"></div>
+        <label class="field v2-note-field"><span>Uma intenção para o plano</span><textarea id="v2Note" rows="3" maxlength="400" placeholder="Ex.: acompanhar germinação e registrar medidas durante seis semanas."></textarea></label>
+        <div class="v2-step-actions"><button class="button button-quiet" type="button" data-v2-prev>Voltar</button><button class="button button-primary" type="button" data-v2-next>Revisar resumo</button></div>
+      </section>
+
+      <section class="v2-step" data-v2-panel="6" aria-labelledby="v2-step-6-title" hidden>
+        <div class="v2-step-heading"><div><p class="section-number">6 de 6</p><h2 id="v2-step-6-title">Resumo para conversar</h2></div><p>Use o resumo como ponto de partida. Confirme condições de segurança, acessibilidade e manejo no local.</p></div>
+        <article id="v2Summary" class="v2-summary"></article>
+        <div class="v2-summary-actions no-print"><button class="button button-primary" type="button" id="v2Print">Imprimir ou salvar PDF</button><button class="button button-secondary" type="button" id="v2Export">Exportar JSON</button><a class="button button-quiet" href="index.html">Abrir versão atual</a></div>
+        <div class="v2-step-actions no-print"><button class="button button-quiet" type="button" data-v2-prev>Voltar</button><button class="button button-danger" type="button" id="v2ResetBottom">Reiniciar versão enxuta</button></div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="v2-footer"><div class="v2-shell"><span>HortaLab Escola · versão enxuta</span><span>Uso educacional · sem dados pessoais</span></div></footer>
+  <div id="v2Live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="js/data.js" defer></script>
+  <script src="js/v2-app.js" defer></script>
+</body>
+</html>

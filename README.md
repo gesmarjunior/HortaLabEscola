@@ -2,6 +2,13 @@
 
 Produto educacional estático para apoiar professores e gestores no planejamento pedagógico, agroecológico e organizacional de hortas escolares. O projeto funciona sem backend, cadastro, banco de dados, analytics ou dependências de execução externas.
 
+## Duas versões disponíveis
+
+- `index.html`: versão completa original, com a jornada acadêmica em nove etapas. Ela foi preservada e pode ser retomada pela tag Git `v1-atual`.
+- `index-v2.html`: versão enxuta, com seis etapas e uma aba `Layout` logo depois de `Composição`. A aba transforma o cenário escolhido em uma montagem isométrica interativa, com seleção, remoção, rotação, zoom e reposicionamento acessível por teclado.
+
+Com o servidor local em execução, a versão enxuta fica disponível em `http://127.0.0.1:4173/index-v2.html`. Em GitHub Pages, o endereço correspondente é `/index-v2.html` dentro do endereço do repositório.
+
 ## Funcionalidades
 
 - jornada guiada em nove etapas;
@@ -34,6 +41,7 @@ Abra `http://127.0.0.1:4173`. Também é possível copiar a pasta para qualquer 
 ```powershell
 npm.cmd test
 npm.cmd run test:e2e
+npm.cmd run test:e2e:v2
 ```
 
 Os testes verificam:
@@ -62,6 +70,7 @@ O teste de interface usa `playwright-core` como dependência de desenvolvimento 
 - `js/export.js`: importação e exportação JSON;
 - `css/print.css`: impressão do plano e da cartilha;
 - `tests/`: testes automatizados sem dependências;
+- `index-v2.html`, `css/v2.css` e `js/v2-app.js`: versão enxuta com layout isométrico;
 - `design/`: conceito e registro de procedência visual.
 
 ## Publicar
