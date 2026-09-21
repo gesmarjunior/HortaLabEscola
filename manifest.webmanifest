@@ -1,0 +1,14 @@
+{
+  "name": "HortaLab Escola",
+  "short_name": "HortaLab",
+  "description": "Planejamento educacional de hortas escolares agroecológicas.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F8F4",
+  "theme_color": "#1F5D4C",
+  "icons": [
+    {"src": "assets/icons/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

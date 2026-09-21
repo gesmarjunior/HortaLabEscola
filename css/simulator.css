@@ -1,0 +1,73 @@
+.simulator-layout { display: grid; grid-template-columns: minmax(220px, .34fr) minmax(0, 1fr); gap: 1.2rem; min-width: 0; }
+.component-library { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--background); }
+.panel-heading { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; padding: 1rem; border-bottom: 1px solid var(--line); }
+.panel-heading h3 { font-size: 1.05rem; }
+.panel-heading span { color: var(--muted); font-size: .74rem; }
+.library-list { display: grid; gap: .45rem; padding: .65rem; min-width: 0; }
+.library-item { width: 100%; min-height: 46px; display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; align-items: center; gap: .65rem; padding: .5rem .6rem; border: 1px solid transparent; border-radius: var(--radius-sm); background: transparent; text-align: left; }
+.library-item:hover { border-color: var(--green-200); background: #fff; }
+.library-icon { width: 1.9rem; height: 1.9rem; display: grid; place-items: center; border-radius: .45rem; background: var(--item-soft); color: var(--item-color); }
+.library-icon svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.library-item strong { display: block; font-size: .81rem; line-height: 1.2; }
+.library-item small { display: block; margin-top: .12rem; color: var(--muted); font-size: .7rem; }
+.library-add { color: var(--green-800); font-size: 1.25rem; font-weight: 500; }
+
+.plot-column { min-width: 0; }
+.plot-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; }
+.plot-toolbar strong { display: block; color: var(--green-900); }
+.plot-toolbar span { display: block; color: var(--muted); font-size: .78rem; }
+.view-switch { display: inline-flex; padding: .18rem; border: 1px solid var(--line); border-radius: .55rem; background: var(--background); }
+.view-switch button { min-height: 34px; border: 0; border-radius: .4rem; padding: .35rem .65rem; background: transparent; color: var(--muted); font-size: .76rem; font-weight: 700; }
+.view-switch button.is-active { background: #fff; color: var(--green-900); box-shadow: var(--shadow-sm); }
+.area-meter { height: .7rem; overflow: hidden; border-radius: 999px; background: #e2e7e3; }
+.area-meter span { display: block; width: 0; height: 100%; background: var(--green-500); transition: width 220ms ease, background-color 220ms ease; }
+.area-meter.is-full span { background: var(--green-800); }
+.area-meter.is-over span { background: var(--red); }
+.area-message { min-height: 1.5rem; margin: .38rem 0 .75rem; color: var(--muted); font-size: .79rem; }
+.area-message.is-warning { color: var(--terracotta-dark); font-weight: 650; }
+
+.plot-grid { min-height: 420px; display: flex; align-content: flex-start; flex-wrap: wrap; gap: .55rem; margin: 0; padding: 1rem; border: 1px solid var(--sand-300); border-radius: var(--radius-md); background-color: var(--sand-100); background-image: linear-gradient(#ddc99f 1px, transparent 1px), linear-gradient(90deg, #ddc99f 1px, transparent 1px); background-size: 34px 34px; list-style: none; }
+.plot-item { position: relative; min-width: 110px; min-height: 82px; flex: 1 1 var(--item-basis); display: flex; flex-direction: column; justify-content: space-between; gap: .6rem; padding: .75rem; border: 2px solid rgba(36,48,43,.22); border-radius: .6rem; background: var(--item-soft); color: var(--ink); box-shadow: 0 4px 10px rgba(36,48,43,.08); cursor: grab; overflow: hidden; }
+.plot-item::after { content: ""; position: absolute; inset: auto 0 0; height: .35rem; background: var(--item-color); }
+.plot-item:hover { border-color: var(--item-color); }
+.plot-item.is-selected { outline: 3px solid var(--focus); outline-offset: 2px; }
+.plot-item.is-dragging { opacity: .45; }
+.plot-item strong { position: relative; z-index: 1; font-size: .84rem; line-height: 1.25; }
+.plot-item span { position: relative; z-index: 1; color: var(--ink-soft); font-size: .75rem; font-weight: 650; }
+.plot-item button { position: absolute; inset: 0; width: 100%; border: 0; background: transparent; color: transparent; }
+.plot-empty { width: 100%; min-height: 350px; display: grid; place-items: center; padding: 2rem; color: var(--muted); text-align: center; }
+
+.plot-grid[data-view="list"] { min-height: 0; display: grid; gap: .5rem; background-image: none; }
+.plot-grid[data-view="list"] .plot-item { min-height: 58px; width: 100%; flex-basis: auto !important; display: grid; grid-template-columns: 1fr auto; align-items: center; }
+.plot-grid[data-view="list"] .plot-item::after { inset: 0 auto 0 0; width: .35rem; height: 100%; }
+
+.component-editor { display: grid; grid-template-columns: minmax(0, 1fr) 150px auto; align-items: end; gap: 1rem; margin-top: .8rem; padding: .9rem; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--background); }
+.component-editor p { color: var(--muted); font-size: .76rem; }
+.component-editor label { font-size: .78rem; font-weight: 700; }
+.component-editor label .input-suffix { margin-top: .3rem; background: #fff; }
+.component-editor input { width: 100%; min-width: 0; padding: .4rem .5rem; border: 0; background: transparent; }
+.editor-actions { display: flex; align-items: center; gap: .45rem; }
+.icon-button { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: .55rem; background: #fff; color: var(--green-900); font-weight: 800; }
+.icon-button:hover { border-color: var(--green-800); background: var(--green-100); }
+
+@media (max-width: 860px) {
+  .simulator-layout { grid-template-columns: 1fr; }
+  .library-list { grid-template-columns: repeat(3, 1fr); }
+  .component-editor { grid-template-columns: 1fr 140px; }
+  .editor-actions { grid-column: 1 / -1; }
+}
+
+@media (max-width: 600px) {
+  .library-list { display: flex; overflow-x: auto; scroll-snap-type: x proximity; }
+  .library-item { min-width: 170px; scroll-snap-align: start; }
+  .plot-toolbar { align-items: flex-end; }
+  .plot-grid { min-height: 360px; padding: .7rem; background-size: 28px 28px; }
+  .plot-item { min-width: 96px; min-height: 74px; padding: .6rem; }
+  .component-editor { grid-template-columns: 1fr; }
+  .editor-actions { grid-column: auto; flex-wrap: wrap; }
+  .component-editor .button-danger { margin-left: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .area-meter span { transition: none; }
+}

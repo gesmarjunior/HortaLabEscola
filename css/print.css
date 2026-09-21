@@ -1,0 +1,21 @@
+@page { size: A4 portrait; margin: 16mm; }
+* { box-shadow: none !important; text-shadow: none !important; }
+body { background: #fff !important; color: #111 !important; font: 10.5pt/1.45 Georgia, "Times New Roman", serif !important; }
+.site-header, .hero, .planner-heading, .progress-nav, .site-footer, .no-print, .step-actions, .component-library, .save-status { display: none !important; }
+.planner-section, .workspace, .step-panel { margin: 0 !important; padding: 0 !important; border: 0 !important; min-height: 0 !important; }
+.step-panel { display: none !important; }
+.step-panel[data-step="8"] { display: block !important; }
+.step-panel[data-step="8"] > .step-intro { display: none !important; }
+.final-plan { border: 0 !important; }
+.plan-cover { display: block !important; padding: 0 0 10mm !important; border-bottom: 2pt solid #1f5d4c; background: transparent !important; color: #111 !important; }
+.plan-cover h3 { color: #1f5d4c !important; font-size: 24pt !important; }
+.plan-cover p, .plan-cover .plan-date { color: #333 !important; }
+.plan-cover .plan-date { margin-top: 3mm; }
+.plan-body { padding: 0 !important; }
+.plan-summary-grid { margin-top: 7mm; }
+.plan-summary-grid strong { color: #1f5d4c !important; }
+.plan-section { break-inside: avoid; page-break-inside: avoid; }
+.plan-section h3 { color: #1f5d4c !important; font-family: Arial, sans-serif; }
+.plan-table { font-size: 9pt; }
+.plan-table th { background: #e7efe4 !important; color: #111 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+a { color: #111 !important; text-decoration: none !important; }

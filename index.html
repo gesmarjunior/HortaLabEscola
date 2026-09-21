@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HortaLab Escola: ferramenta educacional local para planejar hortas escolares agroecológicas de forma participativa.">
+  <meta name="theme-color" content="#1F5D4C">
+  <meta name="color-scheme" content="light">
+  <title>HortaLab Escola — planejamento de hortas escolares</title>
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/simulator.css">
+  <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo principal</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="index.html" aria-label="HortaLab Escola — início">
+        <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M24 41V20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <path d="M23 24C12 24 7 17 7 8c10 0 16 5 16 16Z" fill="currentColor" opacity=".78"/>
+          <path d="M25 19C26 9 33 5 41 6c0 9-6 14-16 13Z" fill="currentColor"/>
+        </svg>
+        <span><strong>HortaLab</strong> Escola</span>
+      </a>
+      <nav class="top-nav" aria-label="Navegação principal">
+        <a href="#planejador">Planejador</a>
+        <a href="cartilha.html">Cartilha</a>
+        <button class="button button-quiet button-small" id="openImport" type="button">Importar plano</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <h1 id="hero-title">Planejar antes de plantar.</h1>
+          <p class="hero-lead">O HortaLab Escola ajuda professores e gestores a transformar uma ideia de horta em um plano pedagógico, agroecológico e possível de cuidar.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#planejador" id="heroStart">Começar planejamento</a>
+            <a class="button button-secondary" href="cartilha.html">Conhecer a cartilha</a>
+          </div>
+          <p class="privacy-note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>
+            Funciona sem cadastro e sem enviar dados. Suas escolhas ficam somente neste dispositivo.
+          </p>
+        </div>
+        <figure class="hero-figure">
+          <img src="assets/images/hero-planejamento.jpg" width="1800" height="1200" alt="Quatro profissionais da educação planejam uma horta sobre uma mesa com mapa, mudas e computador, diante de um pátio escolar.">
+        </figure>
+      </div>
+      <div class="shell principle-row" aria-label="Princípios do HortaLab">
+        <p><strong>Não há tamanho universal.</strong> A escala depende de água, equipe, circulação, calendário e finalidade pedagógica.</p>
+        <p><strong>Planejamento não é autorização.</strong> Confirme solo, segurança, acessibilidade e normas com profissionais e comunidade local.</p>
+      </div>
+    </section>
+
+    <section class="planner-section" id="planejador" aria-labelledby="planner-title">
+      <div class="shell">
+        <div class="section-heading planner-heading">
+          <div>
+            <p class="section-number">Jornada guiada</p>
+            <h2 id="planner-title">Seu plano, passo a passo</h2>
+          </div>
+          <p id="saveStatus" class="save-status" role="status">Pronto para começar</p>
+        </div>
+
+        <nav class="progress-nav" aria-label="Etapas do planejamento">
+          <ol id="progressList">
+            <li><button type="button" data-go-step="1"><span>01</span>Apresentação</button></li>
+            <li><button type="button" data-go-step="2"><span>02</span>Diagnóstico</button></li>
+            <li><button type="button" data-go-step="3"><span>03</span>Cenário</button></li>
+            <li><button type="button" data-go-step="4"><span>04</span>Composição</button></li>
+            <li><button type="button" data-go-step="5"><span>05</span>Pedagogia</button></li>
+            <li><button type="button" data-go-step="6"><span>06</span>Eventos</button></li>
+            <li><button type="button" data-go-step="7"><span>07</span>Viabilidade</button></li>
+            <li><button type="button" data-go-step="8"><span>08</span>Plano final</button></li>
+            <li><button type="button" data-go-step="9"><span>09</span>Cartilha</button></li>
+          </ol>
+        </nav>
+
+        <div class="workspace">
+          <section class="step-panel" data-step="1" aria-labelledby="step1-title">
+            <div class="intro-layout">
+              <div>
+                <p class="section-number">Etapa 1 de 9</p>
+                <h2 id="step1-title">Uma horta começa com boas perguntas</h2>
+                <p class="large-copy">Antes de escolher canteiros ou culturas, o planejamento precisa aproximar o desejo pedagógico das condições reais de cuidado.</p>
+                <ul class="check-list">
+                  <li>Compare três escalas sem transformar 50 m² em meta.</li>
+                  <li>Monte zonas funcionais e preserve circulação.</li>
+                  <li>Relacione atividades curriculares a registros e responsabilidades.</li>
+                  <li>Experimente desafios e revise decisões com feedback transparente.</li>
+                </ul>
+              </div>
+              <aside class="notice notice-caution" aria-label="Limite de uso">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 3 20h18L12 4Z"/><path d="M12 9v5M12 17h.01"/></svg>
+                <div><strong>Uso educacional</strong><p>O HortaLab não substitui avaliação agronômica, nutricional, sanitária, de acessibilidade ou de segurança feita no local.</p></div>
+              </aside>
+            </div>
+            <div class="step-actions end-only">
+              <button class="button button-primary" type="button" data-next-step>Iniciar diagnóstico</button>
+            </div>
+          </section>
+
+          <section class="step-panel" data-step="2" aria-labelledby="step2-title" hidden>
+            <div class="step-intro">
+              <div><p class="section-number">Etapa 2 de 9</p><h2 id="step2-title">Diagnóstico da escola</h2></div>
+              <p>Registre condições do projeto, não dados pessoais. As respostas orientam alertas e podem ser revistas depois.</p>
+            </div>
+            <form id="diagnosisForm" class="diagnosis-form" novalidate>
+              <fieldset class="form-section">
+                <legend>Intenção e espaço</legend>
+                <div class="form-grid">
+                  <label class="field"><span>Finalidade principal</span><select name="purpose" required><option value="">Selecione</option><option value="learning">Aprendizagem interdisciplinar</option><option value="environment">Educação ambiental</option><option value="food">Educação alimentar</option><option value="community">Mobilização comunitária</option><option value="experiment">Projeto-piloto</option></select><small>Define quais atividades e zonas merecem prioridade.</small></label>
+                  <label class="field"><span>Área disponível aproximada</span><span class="input-suffix"><input name="availableArea" type="number" min="1" max="500" step="0.5" inputmode="decimal" required><span>m²</span></span><small>Ajuda a comparar escalas, sem obrigar o uso de todo o espaço.</small></label>
+                  <label class="field"><span>Formato aproximado</span><select name="areaShape"><option value="">Selecione</option><option value="rectangular">Retangular</option><option value="square">Quadrado</option><option value="narrow">Comprido ou estreito</option><option value="fragmented">Fragmentado</option><option value="containers">Somente recipientes</option></select><small>O formato muda circulação, alcance e organização das zonas.</small></label>
+                  <label class="field"><span>Insolação direta</span><select name="sunlight"><option value="">Selecione</option><option value="high">Mais de 6 horas</option><option value="medium">Entre 4 e 6 horas</option><option value="low">Menos de 4 horas</option><option value="unknown">Ainda não observada</option></select><small>Precisa ser observada em diferentes horários e épocas.</small></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="form-section">
+                <legend>Recursos e continuidade</legend>
+                <div class="form-grid">
+                  <label class="field"><span>Disponibilidade de água</span><select name="water"><option value="">Selecione</option><option value="regular">Regular e próxima</option><option value="limited">Limitada ou distante</option><option value="seasonal">Sazonal</option><option value="unknown">Precisa ser confirmada</option></select><small>Água incerta limita escala e diversidade.</small></label>
+                  <label class="field"><span>Condições gerais do solo</span><select name="soil"><option value="">Selecione</option><option value="known">Observado e aparentemente adequado</option><option value="containers">Uso previsto de substrato em recipientes</option><option value="poor">Compactado, encharcado ou degradado</option><option value="unknown">Ainda não avaliado</option></select><small>A observação não substitui análise técnica quando necessária.</small></label>
+                  <label class="field"><span>Quantidade de responsáveis</span><input name="responsibles" type="number" min="0" max="50" step="1" inputmode="numeric"><small>Considere pessoas que assumirão rotinas, não apenas apoiadores ocasionais.</small></label>
+                  <label class="field"><span>Férias e recessos</span><select name="vacation"><option value="">Selecione</option><option value="covered">Há responsáveis e substitutos definidos</option><option value="partial">Há cobertura parcial</option><option value="none">Não há plano de continuidade</option></select><small>Plantas e estruturas continuam exigindo atenção fora do calendário de aulas.</small></label>
+                  <label class="field"><span>Faixa de orçamento</span><select name="budget"><option value="">Selecione</option><option value="none">Sem orçamento definido</option><option value="low">Até R$ 300</option><option value="medium">De R$ 301 a R$ 1.000</option><option value="high">Acima de R$ 1.000</option></select><small>Começar menor pode ser mais sustentável do que depender de compras futuras.</small></label>
+                  <label class="field"><span>Ferramentas disponíveis</span><select name="tools"><option value="">Selecione</option><option value="enough">Conjunto básico disponível</option><option value="partial">Algumas ferramentas</option><option value="none">Ainda não há ferramentas</option></select><small>Inclua armazenamento seguro e uso supervisionado.</small></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="form-section">
+                <legend>Inclusão e experiência</legend>
+                <div class="form-grid">
+                  <label class="field"><span>Necessidade de acessibilidade</span><select name="accessibility"><option value="">Selecione</option><option value="required">Sim, circulação e alcance precisam ser adaptados</option><option value="desirable">Desejável para ampliar participação</option><option value="notIdentified">Não identificada até o momento</option><option value="unknown">Precisa ser confirmada</option></select><small>Acessibilidade envolve percurso, piso, largura, alcance e mediação.</small></label>
+                  <label class="field"><span>Experiência anterior</span><select name="experience"><option value="">Selecione</option><option value="none">Nenhuma</option><option value="some">Experiência pontual</option><option value="ongoing">Projeto anterior ou em andamento</option></select><small>Experiência ajuda, mas não substitui responsabilidades e recursos atuais.</small></label>
+                </div>
+                <div class="choice-group">
+                  <span class="field-label">Componentes curriculares</span>
+                  <p class="field-help">Escolha todos que poderão participar do plano.</p>
+                  <div class="checkbox-grid" id="curricularChoices">
+                    <label><input type="checkbox" name="curricular" value="science"> Ciências</label>
+                    <label><input type="checkbox" name="curricular" value="math"> Matemática</label>
+                    <label><input type="checkbox" name="curricular" value="geography"> Geografia</label>
+                    <label><input type="checkbox" name="curricular" value="language"> Língua Portuguesa</label>
+                    <label><input type="checkbox" name="curricular" value="arts"> Artes</label>
+                    <label><input type="checkbox" name="curricular" value="environmental"> Educação ambiental</label>
+                    <label><input type="checkbox" name="curricular" value="governance"> Governança</label>
+                  </div>
+                </div>
+                <div class="choice-group">
+                  <span class="field-label">Principais limitações</span>
+                  <div class="checkbox-grid" id="limitationsChoices">
+                    <label><input type="checkbox" name="limitations" value="water"> Água</label>
+                    <label><input type="checkbox" name="limitations" value="team"> Equipe</label>
+                    <label><input type="checkbox" name="limitations" value="budget"> Orçamento</label>
+                    <label><input type="checkbox" name="limitations" value="space"> Espaço</label>
+                    <label><input type="checkbox" name="limitations" value="vacation"> Férias</label>
+                    <label><input type="checkbox" name="limitations" value="access"> Acessibilidade</label>
+                    <label><input type="checkbox" name="limitations" value="security"> Segurança</label>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+            <div class="step-actions"><button class="button button-quiet" type="button" data-prev-step>Voltar</button><button class="button button-primary" type="button" data-next-step>Comparar cenários</button></div>
+          </section>
+
+          <section class="step-panel" data-step="3" aria-labelledby="step3-title" hidden>
+            <div class="step-intro"><div><p class="section-number">Etapa 3 de 9</p><h2 id="step3-title">Escolha um cenário de área</h2></div><p>Use a escala como hipótese de planejamento. A área produtiva não precisa ocupar todo o espaço disponível.</p></div>
+            <div class="notice notice-info"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg><div><strong>50 m² não é recomendação universal.</strong><p>Cenários menores podem ser mais adequados quando água, equipe, circulação ou continuidade são limitadas.</p></div></div>
+            <div id="scenarioCards" class="scenario-comparison"></div>
+            <div id="scenarioAdvice" class="scenario-advice" aria-live="polite"></div>
+            <div class="step-actions"><button class="button button-quiet" type="button" data-prev-step>Voltar</button><button class="button button-primary" type="button" data-next-step>Montar composição</button></div>
+          </section>
+
+          <section class="step-panel" data-step="4" aria-labelledby="step4-title" hidden>
+            <div class="step-intro"><div><p class="section-number">Etapa 4 de 9</p><h2 id="step4-title">Composição virtual da horta</h2></div><p>Adicione zonas, ajuste áreas e reorganize o mapa. Arrastar é opcional: todos os comandos também funcionam por clique e teclado.</p></div>
+            <div class="simulator-layout">
+              <aside class="component-library" aria-labelledby="library-title">
+                <div class="panel-heading"><h3 id="library-title">Componentes</h3><span id="libraryHint">Adicionar ao mapa</span></div>
+                <div id="componentLibrary" class="library-list"></div>
+              </aside>
+              <div class="plot-column">
+                <div class="plot-toolbar">
+                  <div><strong id="plotScenario">Cenário</strong><span id="plotAreaText">0 de 0 m² utilizados</span></div>
+                  <div class="view-switch" aria-label="Visualização da composição"><button type="button" class="is-active" data-plot-view="map">Mapa</button><button type="button" data-plot-view="list">Lista</button></div>
+                </div>
+                <div class="area-meter" aria-label="Área utilizada"><span id="areaMeterFill"></span></div>
+                <div id="areaMessage" class="area-message" role="status"></div>
+                <ol id="plotGrid" class="plot-grid" aria-label="Mapa ordenável da horta"></ol>
+                <div id="componentEditor" class="component-editor" hidden>
+                  <div><strong id="editorTitle">Componente selecionado</strong><p id="editorHelp">Ajuste a área ou a posição.</p></div>
+                  <label>Área <span class="input-suffix"><input id="componentAreaInput" type="number" min="0" step="0.1" inputmode="decimal"><span>m²</span></span></label>
+                  <div class="editor-actions"><button type="button" class="icon-button" id="moveEarlier" aria-label="Mover componente para antes">←</button><button type="button" class="icon-button" id="moveLater" aria-label="Mover componente para depois">→</button><button type="button" class="button button-danger button-small" id="removeComponent">Remover</button></div>
+                </div>
+              </div>
+            </div>
+            <div class="step-actions"><button class="button button-quiet" type="button" data-prev-step>Voltar</button><button class="button button-primary" type="button" data-next-step>Planejar atividades</button></div>
+          </section>
+
+          <section class="step-panel" data-step="5" aria-labelledby="step5-title" hidden>
+            <div class="step-intro"><div><p class="section-number">Etapa 5 de 9</p><h2 id="step5-title">Planejamento pedagógico</h2></div><p>Selecione experiências de aprendizagem e registre como serão observadas. A horta é uma plataforma educativa, não apenas produtiva.</p></div>
+            <div id="activityGroups" class="activity-groups"></div>
+            <label class="field plan-note"><span>Intenção do plano pedagógico</span><textarea id="pedagogyNote" rows="4" maxlength="600" placeholder="Ex.: acompanhar a germinação durante seis semanas, registrar medidas e produzir um diário coletivo."></textarea><small><span id="pedagogyCount">0</span>/600 caracteres. Evite registrar nomes de pessoas.</small></label>
+            <div id="selectedActivitiesSummary" class="selection-summary" aria-live="polite"></div>
+            <div class="step-actions"><button class="button button-quiet" type="button" data-prev-step>Voltar</button><button class="button button-primary" type="button" data-next-step>Experimentar desafios</button></div>
+          </section>
+
+          <section class="step-panel" data-step="6" aria-labelledby="step6-title" hidden>
+            <div class="events-hero">
+              <div class="step-intro"><div><p class="section-number">Etapa 6 de 9</p><h2 id="step6-title">Eventos e desafios</h2></div><p>Escolha como o plano responderia a mudanças reais. Você poderá revisar qualquer decisão.</p></div>
+              <img src="assets/images/eventos-adaptacao.jpg" width="1400" height="1050" alt="Vista superior de um plano modular de horta sendo reorganizado entre regador, calendário, ferramentas, composteira e caminho acessível.">
+            </div>
+            <div class="notice notice-info"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg><div><strong>Simulação educativa, não previsão.</strong><p>As consequências são determinísticas e servem para tornar compromissos visíveis; não certificam viabilidade.</p></div></div>
+            <div id="eventList" class="event-list"></div>
+            <div class="step-actions"><button class="button button-quiet" type="button" data-prev-step>Voltar</button><button class="button button-primary" type="button" data-next-step>Ver painel</button></div>
+          </section>
+
+          <section class="step-panel" data-step="7" aria-labelledby="step7-title" hidden>
+            <div class="step-intro"><div><p class="section-number">Etapa 7 de 9</p><h2 id="step7-title">Painel de viabilidade</h2></div><p>Quatro lentes ajudam a conversar sobre o plano. Os resultados explicam escolhas, riscos e pontos que ainda exigem confirmação local.</p></div>
+            <div class="panel-disclaimer"><strong>Leitura orientativa.</strong> Não é certificação, validação agronômica, garantia de produtividade, aprendizagem ou autorização de implantação.</div>
+            <div id="viabilityDashboard" class="viability-dashboard"></div>
+            <details class="rules-details"><summary>Como os indicadores são calculados</summary><div id="rulesExplanation"></div></details>
+            <div class="step-actions"><button class="button button-quiet" type="button" data-prev-step>Voltar</button><button class="button button-primary" type="button" data-next-step>Gerar plano final</button></div>
+          </section>
+
+          <section class="step-panel" data-step="8" aria-labelledby="step8-title" hidden>
+            <div class="step-intro"><div><p class="section-number">Etapa 8 de 9</p><h2 id="step8-title">Plano final</h2></div><p>Use este documento para dialogar com gestão, equipe e comunidade. Confirme as condições no local antes de implantar.</p></div>
+            <div class="plan-toolbar no-print">
+              <button class="button button-primary" type="button" id="printPlan">Imprimir ou salvar como PDF</button>
+              <button class="button button-secondary" type="button" id="exportPlan">Exportar JSON</button>
+              <button class="button button-quiet" type="button" id="importPlan">Importar JSON</button>
+              <button class="button button-danger" type="button" id="resetPlan">Reiniciar</button>
+            </div>
+            <article id="finalPlan" class="final-plan" aria-label="Relatório final do planejamento"></article>
+            <div class="step-actions no-print"><button class="button button-quiet" type="button" data-prev-step>Voltar</button><button class="button button-primary" type="button" data-next-step>Abrir cartilha</button></div>
+          </section>
+
+          <section class="step-panel" data-step="9" aria-labelledby="step9-title" hidden>
+            <div class="guide-invite">
+              <img src="assets/images/pesquisa-acao.jpg" width="1400" height="1050" alt="Quatro educadores diversos analisam uma maquete de horta em uma escola, com caminho acessível ao fundo.">
+              <div><p class="section-number">Etapa 9 de 9</p><h2 id="step9-title">A cartilha continua a conversa</h2><p>Consulte fundamentos, pesquisa-ação, critérios de área, manutenção, acessibilidade, segurança, governança, checklists, glossário e referências acadêmicas.</p><a class="button button-primary" href="cartilha.html">Abrir cartilha digital</a></div>
+            </div>
+            <div class="step-actions"><button class="button button-quiet" type="button" data-prev-step>Voltar ao plano</button><button class="button button-secondary" type="button" data-go-step="2">Revisar diagnóstico</button></div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-grid"><div><a class="brand footer-brand" href="index.html"><svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 41V20" fill="none" stroke="currentColor" stroke-width="3"/><path d="M23 24C12 24 7 17 7 8c10 0 16 5 16 16Z" fill="currentColor" opacity=".78"/><path d="M25 19C26 9 33 5 41 6c0 9-6 14-16 13Z" fill="currentColor"/></svg><span><strong>HortaLab</strong> Escola</span></a><p>Produto educacional para planejamento crítico e participativo.</p></div><div><strong>Privacidade</strong><p>Sem cadastro, analytics, cookies ou transmissão de dados. O plano é salvo somente no navegador.</p></div><div><strong>Uso responsável</strong><p>Confirme solo, água, segurança, acessibilidade, espécies e normas com profissionais competentes.</p></div></div>
+  </footer>
+
+  <input id="importFile" type="file" accept="application/json,.json" hidden>
+  <div id="appLive" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <dialog id="confirmDialog" class="confirm-dialog" aria-labelledby="confirmTitle"><form method="dialog"><h2 id="confirmTitle">Reiniciar planejamento?</h2><p>As escolhas salvas neste navegador serão apagadas. Exporte o plano antes, se quiser preservá-lo.</p><div class="dialog-actions"><button class="button button-quiet" value="cancel">Cancelar</button><button class="button button-danger" value="confirm">Reiniciar</button></div></form></dialog>
+
+  <script src="js/data.js" defer></script>
+  <script src="js/state.js" defer></script>
+  <script src="js/rules.js" defer></script>
+  <script src="js/storage.js" defer></script>
+  <script src="js/charts.js" defer></script>
+  <script src="js/simulator.js" defer></script>
+  <script src="js/export.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
