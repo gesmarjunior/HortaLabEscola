@@ -42,6 +42,8 @@ npm.cmd test
 npm.cmd run test:e2e
 ```
 
+Para o teste de navegador, mantenha `npm.cmd start` executando em outro terminal (ou use `npm.cmd start` antes da rodada).
+
 Os testes verificam:
 
 - soma exata dos três cenários;
