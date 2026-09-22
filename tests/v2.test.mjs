@@ -11,15 +11,7 @@ async function loadData() {
   return context.window.HortaLab;
 }
 
-test("a versão enxuta expõe a etapa Layout isométrico depois da composição", async () => {
-  const html = await readFile(new URL("../index-v2.html", import.meta.url), "utf8");
-  assert.equal((html.match(/class="v2-step" data-v2-panel=/g) || []).length, 6);
-  assert.match(html, /data-v2-panel="3"[\s\S]*data-v2-panel="4"/);
-  assert.match(html, /id="v2IsoCanvas"/);
-  assert.match(html, /data-v2-nudge="ArrowRight"/);
-});
-
-test("a composição inicial da versão enxuta preserva os totais de 12, 25 e 50 m²", async () => {
+test("os cenários oficiais preservam a soma exata das áreas", async () => {
   const data = await loadData();
   for (const scenario of data.SCENARIOS) {
     const total = scenario.seed.reduce((sum, [, area]) => sum + area, 0);
@@ -27,11 +19,21 @@ test("a composição inicial da versão enxuta preserva os totais de 12, 25 e 50
   }
 });
 
-test("a versão enxuta não adiciona dependências remotas", async () => {
-  const files = ["index-v2.html", "css/v2.css", "js/v2-app.js"];
-  for (const file of files) {
-    const text = await readFile(new URL(`../${file}`, import.meta.url), "utf8");
-    assert.doesNotMatch(text, /(?:src|href)=['"]https?:\/\//i, file);
-    assert.doesNotMatch(text, /@import\s+url\(https?:\/\//i, file);
-  }
+test("a composição de 50 m² preserva as cinco parcelas acadêmicas", async () => {
+  const data = await loadData();
+  const expanded = data.SCENARIOS.find((item) => item.id === "expanded");
+  const grouped = expanded.seed.reduce((acc, [type, area]) => { acc[type] = (acc[type] || 0) + area; return acc; }, {});
+  assert.equal(Math.round(grouped.bed * 10) / 10, 19.8);
+  assert.equal(Math.round((grouped.paths + grouped.maneuver) * 10) / 10, 17.2);
+  assert.equal(Math.round((grouped.water + grouped.seedlings + grouped.tools) * 10) / 10, 4);
+  assert.equal(Math.round(grouped.compost * 10) / 10, 3);
+  assert.equal(Math.round((grouped.pedagogy + grouped.observation) * 10) / 10, 6);
+});
+
+test("o layout usa componentes editáveis e controles acessíveis", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /id="v2CompositionCanvas"/);
+  assert.match(html, /id="v2IsoCanvas"/);
+  assert.match(html, /data-v2-nudge="ArrowUp"/);
+  assert.match(html, /aria-label="Mover para a direita"/);
 });

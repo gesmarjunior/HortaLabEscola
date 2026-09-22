@@ -1,18 +1,18 @@
 {
   "name": "hortalab-escola",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "description": "Produto educacional estático para planejamento de hortas escolares agroecológicas.",
   "scripts": {
     "start": "node server.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:e2e": "node tests/e2e.mjs",
-    "test:e2e:v2": "node tests/v2-e2e.mjs"
+    "test:e2e": "node tests/e2e.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "playwright-core": "^1.63.0"
+    "playwright-core": "^1.63.0",
+    "sql.js": "^1.14.2"
   }
 }

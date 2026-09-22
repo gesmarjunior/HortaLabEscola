@@ -4,7 +4,8 @@ const APP_SHELL = [
   "./css/styles.css", "./css/simulator.css", "./css/cartilha.css", "./css/print.css",
   "./js/data.js", "./js/state.js", "./js/rules.js", "./js/storage.js", "./js/charts.js",
   "./js/simulator.js", "./js/export.js", "./js/app.js", "./js/cartilha.js",
-  "./index-v2.html", "./css/v2.css", "./js/v2-app.js",
+  "./index.html", "./css/planner.css", "./js/planner.js", "./js/local-db.js",
+  "./assets/vendor/sql-wasm.js", "./assets/vendor/sql-wasm.wasm",
   "./assets/icons/favicon.svg", "./assets/images/hero-planejamento.jpg",
   "./assets/images/pesquisa-acao.jpg", "./assets/images/eventos-adaptacao.jpg"
 ];

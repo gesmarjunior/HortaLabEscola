@@ -1,27 +1,26 @@
 # HortaLab Escola
 
-Produto educacional estático para apoiar professores e gestores no planejamento pedagógico, agroecológico e organizacional de hortas escolares. O projeto funciona sem backend, cadastro, banco de dados, analytics ou dependências de execução externas.
+Produto educacional estático para apoiar professores e gestores no planejamento pedagógico, agroecológico e organizacional de hortas escolares. O projeto funciona sem backend, cadastro, banco remoto, analytics ou dependências de execução externas.
 
-## Duas versões disponíveis
+## Versão oficial e histórico
 
-- `index.html`: versão completa original, com a jornada acadêmica em nove etapas. Ela foi preservada e pode ser retomada pela tag Git `v1-atual`.
-- `index-v2.html`: versão enxuta, com seis etapas e uma aba `Layout` logo depois de `Composição`. A aba transforma o cenário escolhido em uma montagem isométrica interativa, com seleção, remoção, rotação, zoom e reposicionamento acessível por teclado.
+O produto possui uma única entrada oficial em `index.html`. A jornada foi simplificada para seis etapas e inclui a aba `Layout` logo depois de `Composição`, com montagem isométrica interativa, seleção, remoção, rotação, zoom e reposicionamento acessível por teclado.
 
-Com o servidor local em execução, a versão enxuta fica disponível em `http://127.0.0.1:4173/index-v2.html`. Em GitHub Pages, o endereço correspondente é `/index-v2.html` dentro do endereço do repositório.
+A versão anterior não foi apagada do histórico: a tag Git `v1-atual` aponta para o estado anterior do projeto. Assim, o GitHub mantém versionamento real sem criar duas aplicações concorrentes no site publicado.
 
 ## Funcionalidades
 
-- jornada guiada em nove etapas;
+- jornada guiada em seis etapas;
 - diagnóstico sem dados pessoais;
 - cenários comparativos de 12, 25 e 50 m²;
 - simulador de composição com mapa, lista, arrastar e soltar e comandos equivalentes por botão/teclado;
 - total de área validado em tempo real;
+- layout isométrico de alta qualidade gráfica com zonas selecionáveis;
 - planejamento curricular e atividades selecionáveis;
-- oito eventos com decisões, consequências e impactos determinísticos;
-- painel ambiental, social, de governança e pedagógico com evidências, riscos, melhorias e confirmações locais;
-- relatório final imprimível;
+- resumo imprimível do plano;
 - exportação e importação JSON validadas;
-- salvamento em `localStorage` com tratamento de erro;
+- salvamento local em banco SQLite no navegador, persistido no IndexedDB do próprio dispositivo;
+- exportação e importação de backup `.sqlite`;
 - cartilha digital completa e imprimível;
 - manifest e service worker para cache local quando servido por HTTP(S); o site continua funcional sem o service worker.
 
@@ -41,7 +40,6 @@ Abra `http://127.0.0.1:4173`. Também é possível copiar a pasta para qualquer 
 ```powershell
 npm.cmd test
 npm.cmd run test:e2e
-npm.cmd run test:e2e:v2
 ```
 
 Os testes verificam:
@@ -51,26 +49,31 @@ Os testes verificam:
 - determinismo e limites dos indicadores;
 - impacto previsível dos eventos;
 - rejeição de JSON com área impossível;
-- presença das nove etapas e controles essenciais;
+- presença das seis etapas e controles essenciais;
+- schema e persistência SQLite local;
+- exportação/importação JSON e SQLite;
 - cobertura temática da cartilha;
-- ausência de scripts, fontes e imagens remotas.
+- ausência de scripts, fontes e imagens remotas;
+- jornada no navegador, console, impressão e responsividade em 360, 768, 1024 e 1440 px.
 
-O teste de interface usa `playwright-core` como dependência de desenvolvimento e o Chrome ou Edge já instalado, sem baixar outro navegador. Com o servidor local em execução, ele percorre a jornada, testa persistência, JSON, impressão e quatro larguras, verifica o console e grava as capturas em `screenshots/`.
+O teste de interface usa `playwright-core` como dependência de desenvolvimento e o Chrome ou Edge já instalado, sem baixar outro navegador. Ele percorre a jornada, valida a persistência após recarregar, gera os arquivos de exportação e salva capturas de QA em `%TEMP%\hortalab-escola-qa`.
+
+As capturas revisadas também ficam versionadas em `screenshots/layout-desktop-v2.png` e `screenshots/layout-mobile-v2.png`.
 
 ## Estrutura
 
-- `index.html`: jornada e planejador;
+- `index.html`: jornada oficial e planejador;
 - `cartilha.html`: cartilha digital;
 - `js/data.js`: cenários, componentes, atividades e eventos;
-- `js/state.js`: estado da aplicação;
+- `js/state.js`: estado e regras do produto acadêmico original;
 - `js/rules.js`: regras determinísticas e explicáveis;
-- `js/simulator.js`: composição visual e reorganização;
-- `js/storage.js`: persistência e validação de importação;
-- `js/charts.js`: indicadores acessíveis;
-- `js/export.js`: importação e exportação JSON;
+- `js/local-db.js`: SQLite local em WebAssembly, persistido no IndexedDB;
+- `js/planner.js`: interface oficial, composição, layout e exportações;
+- `js/storage.js`: validador legado mantido para os testes dos módulos acadêmicos anteriores (não é usado pela aplicação oficial);
+- `css/planner.css`: identidade visual e layout do planejador;
 - `css/print.css`: impressão do plano e da cartilha;
-- `tests/`: testes automatizados sem dependências;
-- `index-v2.html`, `css/v2.css` e `js/v2-app.js`: versão enxuta com layout isométrico;
+- `assets/vendor/sql-wasm.js` e `assets/vendor/sql-wasm.wasm`: motor SQLite incorporado localmente;
+- `tests/`: testes automatizados de regras, estrutura, SQLite e jornada visual;
 - `design/`: conceito e registro de procedência visual.
 
 ## Publicar
@@ -81,7 +84,7 @@ Se publicar em um subdiretório, mantenha a estrutura relativa de arquivos. O `s
 
 ## Privacidade e funcionamento offline
 
-Nenhum dado é enviado a servidores. O plano é salvo somente no `localStorage` do navegador. A exportação cria um arquivo JSON no próprio dispositivo. A importação valida versão, tipos, áreas, atividades e decisões antes de aplicar o conteúdo.
+Nenhum dado é enviado a servidores. O plano é salvo em um banco SQLite no próprio dispositivo; o arquivo binário fica persistido no IndexedDB do navegador. A exportação cria um JSON e também permite baixar um backup `.sqlite`. A importação valida cenário, tipos, áreas e estrutura antes de aplicar o conteúdo.
 
 Todos os recursos necessários estão no projeto. Após a primeira visita por HTTP(S), o service worker mantém o conjunto principal em cache. Ao abrir por um servidor local, o produto também funciona sem internet. A aplicação não depende do service worker para iniciar.
 
@@ -93,4 +96,4 @@ A interface utiliza HTML semântico, skip link, foco visível, labels associados
 
 ## Limitações
 
-O HortaLab é um recurso educacional e não certifica viabilidade. Não substitui avaliação agronômica, análise de solo ou água, orientação nutricional ou sanitária, verificação de acessibilidade e segurança, autorizações, normas locais ou decisão da comunidade escolar. Os indicadores simplificam relações complexas e não garantem produtividade, aprendizagem ou continuidade de uma horta real.
+O HortaLab é um recurso educacional e não certifica viabilidade. Não substitui avaliação agronômica, análise de solo ou água, orientação nutricional ou sanitária, verificação de acessibilidade e segurança, autorizações, normas locais ou decisão da comunidade escolar. Os indicadores simplificam relações complexas e não garantem produtividade, aprendizagem ou continuidade de uma horta real. O SQLite é local ao navegador/dispositivo: para transportar o plano entre dispositivos, use a exportação JSON ou SQLite.
