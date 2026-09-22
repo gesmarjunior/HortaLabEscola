@@ -4,7 +4,7 @@ Produto educacional estático para apoiar professores e gestores no planejamento
 
 ## Versão oficial e histórico
 
-O produto possui uma única entrada oficial em `index.html`. Na versão `2.1.0`, a jornada simplificada mantém a composição 2D antes da aba `Layout`: o usuário escolhe os componentes no catálogo, organiza o mapa e então configura o mesmo conjunto na montagem isométrica, com seleção, remoção, rotação, zoom e reposicionamento acessível por teclado.
+O produto possui uma única entrada oficial em `index.html`. Na versão `2.1.1`, a jornada simplificada mantém a composição 2D antes da aba `Layout`: o usuário escolhe os componentes no catálogo, organiza o mapa e então configura o mesmo conjunto na montagem isométrica, com seleção, remoção, rotação, zoom e reposicionamento acessível por teclado.
 
 A versão anterior não foi apagada do histórico: a tag Git `v1-atual` aponta para o estado anterior do projeto. Assim, o GitHub mantém versionamento real sem criar duas aplicações concorrentes no site publicado.
 
@@ -92,7 +92,7 @@ Nenhum dado é enviado a servidores. O plano é salvo em um banco SQLite no pró
 
 Todos os recursos necessários estão no projeto. Após a primeira visita por HTTP(S), o service worker mantém o conjunto principal em cache. Ao abrir por um servidor local, o produto também funciona sem internet. A aplicação não depende do service worker para iniciar.
 
-Ao publicar uma nova versão, incremente `CACHE_NAME` em `service-worker.js` (por exemplo, de `hortalab-escola-v2-1-0` para `hortalab-escola-v2-1-1`); a ativação remove caches antigos e passa a servir o conjunto atualizado.
+Ao publicar uma nova versão, incremente `CACHE_NAME` em `service-worker.js` e a versão nos URLs de `css/planner.css` e `js/planner.js`; a ativação remove caches antigos e os URLs versionados impedem que HTML novo seja combinado com recursos antigos.
 
 ## Acessibilidade
 

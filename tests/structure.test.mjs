@@ -10,6 +10,8 @@ test("a versão oficial contém a jornada curta e Layout depois de Composição"
   assert.match(html, /data-v2-nudge="ArrowRight"/);
   assert.match(html, /sql-wasm\.js/);
   assert.match(html, /js\/local-db\.js/);
+  assert.match(html, /css\/planner\.css\?v=2\.1\.1/);
+  assert.match(html, /js\/planner\.js\?v=2\.1\.1/);
 });
 
 test("o SQLite local possui schema e não usa localStorage", async () => {
