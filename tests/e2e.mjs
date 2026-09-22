@@ -67,6 +67,14 @@ await page.screenshot({ path: join(qaDir, "composition-desktop.png"), fullPage: 
 await page.locator('[data-v2-panel="3"] [data-v2-next]').click();
 check(await page.locator("#v2IsoCanvas").isVisible(), "O layout isométrico não está visível.");
 check(await page.locator("#v2IsoCanvas .iso-hit").count() === 11, "A cena não renderizou todos os componentes.");
+for (const selector of [".iso-water-tank", ".iso-water-tap", ".iso-water-hose", ".iso-nursery-bench", ".iso-tool-rack", ".iso-compost-bin", ".iso-learning-table", ".iso-observation-bench"]) {
+  check(await page.locator(`#v2IsoCanvas ${selector}`).count() > 0, `O objeto isométrico ${selector} não foi renderizado.`);
+}
+const waterObject = page.locator('#v2IsoCanvas [data-iso-type="water"]');
+await waterObject.focus();
+await waterObject.press("Enter");
+await waterObject.press("ArrowRight");
+check((await text("#v2Live")).includes("Ponto de água reposicionado"), "O objeto de água não respondeu à seleção e ao movimento por teclado.");
 await page.locator('[data-v2-layout-select]').first().click();
 await page.locator('[data-v2-nudge="ArrowRight"]').click();
 await page.locator("#v2Rotate").click();

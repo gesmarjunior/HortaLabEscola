@@ -38,3 +38,13 @@ test("o layout usa componentes editáveis e controles acessíveis", async () => 
   assert.match(html, /data-v2-nudge="ArrowUp"/);
   assert.match(html, /aria-label="Mover para a direita"/);
 });
+
+test("cada componente possui uma representação isométrica específica", async () => {
+  const source = await readFile(new URL("../js/planner.js", import.meta.url), "utf8");
+  for (const marker of [
+    'wrap("bed"', 'wrap("container"', 'wrap("paths"', "iso-access-symbol",
+    "iso-water-tank", "iso-water-tap", "iso-water-hose", "iso-nursery-bench",
+    "iso-tool-rack", "iso-compost-bin", "iso-learning-table",
+    "iso-observation-bench", "iso-signpost"
+  ]) assert.ok(source.includes(marker), marker);
+});

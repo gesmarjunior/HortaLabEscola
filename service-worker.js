@@ -1,10 +1,10 @@
-const CACHE_NAME = "hortalab-escola-v2-1-1";
+const CACHE_NAME = "hortalab-escola-v2-2-0";
 const APP_SHELL = [
   "./", "./index.html", "./cartilha.html", "./manifest.webmanifest",
   "./css/styles.css", "./css/simulator.css", "./css/cartilha.css", "./css/print.css",
   "./js/data.js", "./js/state.js", "./js/rules.js", "./js/storage.js", "./js/charts.js",
   "./js/simulator.js", "./js/export.js", "./js/app.js", "./js/cartilha.js",
-  "./index.html", "./css/planner.css?v=2.1.1", "./js/planner.js?v=2.1.1", "./js/local-db.js",
+  "./index.html", "./css/planner.css?v=2.2.0", "./js/planner.js?v=2.2.0", "./js/local-db.js",
   "./assets/vendor/sql-wasm.js", "./assets/vendor/sql-wasm.wasm",
   "./assets/icons/favicon.svg", "./assets/images/hero-planejamento.jpg",
   "./assets/images/pesquisa-acao.jpg", "./assets/images/eventos-adaptacao.jpg"
