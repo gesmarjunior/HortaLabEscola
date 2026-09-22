@@ -88,7 +88,7 @@ Nenhum dado é enviado a servidores. O plano é salvo em um banco SQLite no pró
 
 Todos os recursos necessários estão no projeto. Após a primeira visita por HTTP(S), o service worker mantém o conjunto principal em cache. Ao abrir por um servidor local, o produto também funciona sem internet. A aplicação não depende do service worker para iniciar.
 
-Ao publicar uma nova versão, incremente `CACHE_NAME` em `service-worker.js` (por exemplo, de `hortalab-escola-v1` para `hortalab-escola-v2`); a ativação remove caches antigos e passa a servir o conjunto atualizado.
+Ao publicar uma nova versão, incremente `CACHE_NAME` em `service-worker.js` (por exemplo, de `hortalab-escola-v2-0-0` para `hortalab-escola-v2-0-1`); a ativação remove caches antigos e passa a servir o conjunto atualizado.
 
 ## Acessibilidade
 
