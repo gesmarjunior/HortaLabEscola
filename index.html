@@ -76,15 +76,28 @@
         <div class="v2-step-heading"><div><p class="section-number">3 de 6</p><h2 id="v2-step-3-title">Composição</h2></div><p>Adicione o que precisa existir no plano. A área nunca pode ultrapassar a escala escolhida.</p></div>
         <div class="v2-composition-grid">
           <aside class="v2-panel v2-library-panel" aria-labelledby="v2-library-title">
-            <div class="v2-panel-heading"><div><h3 id="v2-library-title">Biblioteca de zonas</h3><span>Inclua só o que a equipe consegue cuidar</span></div></div>
+            <div class="v2-panel-heading"><div><h3 id="v2-library-title">Componentes</h3><span>Adicionar ao mapa</span></div><span aria-hidden="true">＋</span></div>
             <div id="v2Library" class="v2-library"></div>
           </aside>
-          <div class="v2-panel v2-composition-preview-panel">
-            <div class="v2-area-head"><div><strong id="v2CompositionScenario">Cenário</strong><span id="v2CompositionArea">0 m² de 0 m²</span></div><div class="v2-area-meter"><span id="v2CompositionMeter"></span></div></div>
-            <div class="v2-composition-canvas-wrap"><svg id="v2CompositionCanvas" viewBox="100 95 560 350" role="img" aria-labelledby="v2CompositionTitle v2CompositionDesc"><title id="v2CompositionTitle">Prévia da composição</title><desc id="v2CompositionDesc">Prévia do cenário com as zonas selecionadas.</desc></svg></div>
-            <div id="v2CompositionMessage" class="v2-inline-note" role="status"></div>
-          </div>
-          <aside class="v2-panel v2-composition-list-panel" aria-labelledby="v2-selected-title"><div class="v2-panel-heading"><div><h3 id="v2-selected-title">Zonas no plano</h3><span>Edite a área ou retire uma zona</span></div><strong id="v2CompositionCount">0</strong></div><div id="v2ComponentList" class="v2-component-list" aria-label="Componentes escolhidos"></div></aside>
+          <section class="v2-panel v2-composition-workarea" aria-labelledby="v2-plot-title">
+            <div class="v2-compose-toolbar">
+              <div><strong id="v2CompositionScenario">Cenário</strong><span id="v2CompositionArea">0 de 0 m² utilizados</span></div>
+              <div class="v2-compose-toolbar-actions">
+                <button class="v2-icon-button" type="button" data-v2-history="undo" aria-label="Desfazer" disabled>↶</button>
+                <button class="v2-icon-button" type="button" data-v2-history="redo" aria-label="Refazer" disabled>↷</button>
+                <div class="v2-view-switch" role="group" aria-label="Visualização da composição"><button type="button" data-v2-plot-view="map">Mapa</button><button type="button" data-v2-plot-view="list">Lista</button></div>
+              </div>
+            </div>
+            <div class="v2-compose-canvasbar"><div><h3 id="v2-plot-title">Mapa da composição</h3><span id="v2CompositionMessage" role="status"></span></div><button class="v2-grid-toggle" type="button" data-v2-grid-toggle aria-pressed="true">Grade</button></div>
+            <div class="v2-area-meter" aria-label="Área utilizada"><span id="v2CompositionMeter"></span></div>
+            <ol id="v2PlotGrid" class="v2-plot-grid" aria-label="Mapa ordenável da horta"></ol>
+            <div id="v2ComponentEditor" class="v2-component-editor" hidden>
+              <div class="v2-editor-summary"><span id="v2EditorIcon" class="v2-editor-icon" aria-hidden="true"></span><div><strong id="v2EditorTitle">Componente selecionado</strong><p id="v2EditorHelp">Ajuste a área ou a posição.</p></div></div>
+              <label class="v2-editor-area">Área <span class="input-suffix"><input id="v2CompositionAreaInput" type="number" min="0" step="0.1" inputmode="decimal"><span>m²</span></span></label>
+              <div class="v2-editor-actions"><button type="button" class="v2-icon-button" data-v2-move="-1" aria-label="Mover componente para antes">↑</button><button type="button" class="v2-icon-button" data-v2-move="1" aria-label="Mover componente para depois">↓</button><button type="button" class="button button-danger button-small" id="v2RemoveComponent">Remover</button></div>
+            </div>
+            <p class="v2-compose-footnote">A composição define o que existe. Na próxima etapa, o mesmo conjunto vira uma leitura isométrica para ajustar posições e circulação.</p>
+          </section>
         </div>
         <div class="v2-step-actions"><button class="button button-quiet" type="button" data-v2-prev>Voltar</button><button class="button button-primary" type="button" data-v2-next>Ver layout</button></div>
       </section>

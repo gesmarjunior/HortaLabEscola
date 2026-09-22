@@ -15,6 +15,9 @@
   let dbReady = false;
   let saveTimer = null;
   let pendingSave = Promise.resolve();
+  let history = [];
+  let future = [];
+  let draggedId = null;
 
   const uid = (type) => `horta-${type}-${Date.now().toString(36)}-${(++idCounter).toString(36)}`;
   const areaTotal = (items) => Math.round(items.reduce((sum, item) => sum + Number(item.area || 0), 0) * 10) / 10;
@@ -44,6 +47,8 @@
       selectedId: null,
       activities: [],
       note: "",
+      plotView: "map",
+      showGrid: true,
       zoom: 1,
       rotation: 0,
       layoutVersion: 3,
@@ -79,6 +84,8 @@
       selectedId,
       activities: Array.isArray(raw.activities) ? raw.activities.filter((item) => typeof item === "string") : [],
       note: typeof raw.note === "string" ? raw.note.slice(0, 400) : "",
+      plotView: raw.plotView === "list" ? "list" : "map",
+      showGrid: raw.showGrid !== false,
       step: clamp(Number(raw.step) || 1, 1, 6),
       zoom: clamp(Number(raw.zoom) || 1, 0.85, 1.15),
       rotation: Number(raw.rotation) === 1 ? 1 : 0,
@@ -90,6 +97,29 @@
 
   function scenario() { return scenarioFor(state.scenarioId); }
   function selected() { return state.components.find((item) => item.id === state.selectedId) || null; }
+  function recordHistory() {
+    history.push(clone(state));
+    if (history.length > 40) history.shift();
+    future = [];
+  }
+  function restoreSnapshot(snapshot, message) {
+    state = normalizeState(snapshot);
+    save(true);
+    renderAll();
+    announce(message);
+  }
+  function undo() {
+    const snapshot = history.pop();
+    if (!snapshot) return;
+    future.push(clone(state));
+    restoreSnapshot(snapshot, "Última mudança desfeita.");
+  }
+  function redo() {
+    const snapshot = future.pop();
+    if (!snapshot) return;
+    history.push(clone(state));
+    restoreSnapshot(snapshot, "Mudança refeita.");
+  }
   function announce(message) { const live = $("#v2Live"); if (live) live.textContent = message; }
   function setStorageStatus(text, tone = "ready") { const element = $("#v2StorageStatus"); if (element) { element.textContent = text; element.dataset.tone = tone; } }
 
@@ -120,6 +150,7 @@
 
   function selectScenario(id) {
     if (!HL.SCENARIOS.some((item) => item.id === id)) return;
+    recordHistory();
     state.scenarioId = id;
     state.components = seedComponents(id);
     state.selectedId = null;
@@ -169,16 +200,6 @@
     container.innerHTML = Object.entries(HL.COMPONENT_TYPES).map(([type, item]) => `<button type="button" class="v2-library-button" data-v2-add="${type}" style="--item-color:${item.color};--item-soft:${item.soft}" aria-label="Adicionar ${item.label}">
       <span class="v2-library-icon" aria-hidden="true">${item.icon}</span><span class="v2-library-copy"><strong>${item.short}</strong><small>${formatArea(item.defaultArea)} m² · ${escapeHtml(item.resource)}</small></span><span class="v2-add-mark" aria-hidden="true">+</span>
     </button>`).join("");
-  }
-
-  function componentRow(item) {
-    const type = HL.COMPONENT_TYPES[item.type];
-    return `<div class="v2-component-row${item.id === state.selectedId ? " is-selected" : ""}" data-v2-row="${item.id}">
-      <span class="v2-component-icon" style="color:${type.color}" aria-hidden="true">${type.icon}</span>
-      <button type="button" data-v2-select="${item.id}"><strong>${type.label}</strong><small>${escapeHtml(type.resource)}</small></button>
-      <label class="v2-area-editor"><span class="sr-only">Área de ${type.label}</span><input class="v2-component-area" id="v2-area-${item.id}" data-v2-area="${item.id}" type="number" min="0" step="0.1" value="${item.area.toFixed(1)}" inputmode="decimal" aria-label="Área de ${type.label}"><span>m²</span></label>
-      <button class="v2-remove" type="button" data-v2-remove="${item.id}" aria-label="Remover ${type.label}">Remover</button>
-    </div>`;
   }
 
   function gridSize() {
@@ -269,20 +290,6 @@
     });
   }
 
-  function renderComposition() {
-    const current = scenario();
-    const total = areaTotal(state.components);
-    $("#v2CompositionScenario").textContent = `${current.area} m² · ${current.name}`;
-    $("#v2CompositionArea").textContent = `${formatArea(total)} de ${formatArea(current.area)} m² utilizados`;
-    $("#v2CompositionMeter").style.width = `${Math.min(100, (total / current.area) * 100)}%`;
-    $("#v2CompositionCount").textContent = `${state.components.length}`;
-    $("#v2ComponentList").innerHTML = state.components.length ? state.components.map(componentRow).join("") : '<p class="v2-hint">Nenhuma zona adicionada.</p>';
-    const message = $("#v2CompositionMessage");
-    message.textContent = total > current.area ? "A composição ultrapassa a área. Reduza ou remova uma zona antes de continuar." : `${formatArea(current.area - total)} m² livres para circulação, pausa ou expansão futura.`;
-    message.dataset.tone = total > current.area ? "error" : "info";
-    renderIsoInto($("#v2CompositionCanvas"), false);
-  }
-
   function renderLayout() {
     const current = scenario();
     const total = areaTotal(state.components);
@@ -317,6 +324,55 @@
       <section class="v2-summary-block"><h3>Próximo passo</h3><p>Confirme no local o percurso, a segurança, a água, o solo, o alcance e a rotina de cuidado antes de qualquer implantação.</p></section>`;
   }
 
+  function compositionCard(item, index, current) {
+    const type = HL.COMPONENT_TYPES[item.type];
+    const basis = Math.max(20, Math.min(100, (Number(item.area || 0) / current.area) * 160));
+    return `<li class="v2-plot-item${item.id === state.selectedId ? " is-selected" : ""}" data-v2-component-id="${item.id}" style="--item-color:${type.color};--item-soft:${type.soft};--item-basis:${basis}%" draggable="true">
+      <span class="v2-plot-icon" aria-hidden="true">${type.icon}</span><span class="v2-plot-copy"><strong>${type.label}</strong><span>${formatArea(item.area)} m² · posição ${index + 1}</span></span>
+      <button type="button" class="v2-plot-select" data-v2-select="${item.id}" aria-label="Selecionar ${type.label}, ${formatArea(item.area)} metros quadrados, posição ${index + 1}"></button>
+    </li>`;
+  }
+
+  function renderComposition() {
+    const current = scenario();
+    const total = areaTotal(state.components);
+    const remaining = Math.round((current.area - total) * 10) / 10;
+    const percent = current.area ? Math.min(100, (total / current.area) * 100) : 0;
+    const grid = $("#v2PlotGrid");
+    if (!grid) return;
+    $("#v2CompositionScenario").textContent = `${current.area} m² — ${current.name}`;
+    $("#v2CompositionArea").textContent = `${formatArea(total)} de ${formatArea(current.area)} m² utilizados`;
+    $("#v2CompositionMeter").style.width = `${percent}%`;
+    grid.dataset.view = state.plotView;
+    grid.classList.toggle("is-grid-hidden", !state.showGrid);
+    grid.innerHTML = state.components.length ? state.components.map((item, index) => compositionCard(item, index, current)).join("") : '<li class="v2-plot-empty">O mapa está vazio. Adicione um componente pela biblioteca.</li>';
+    $("#v2CompositionMessage").textContent = remaining > 0 ? `${formatArea(remaining)} m² livres. Espaço livre também apoia segurança e adaptação.` : "A área está totalmente distribuída. Para adicionar algo, reduza ou remova outro componente.";
+    $("#v2CompositionMessage").dataset.tone = remaining <= 0 ? "warning" : "info";
+    $$('[data-v2-plot-view]').forEach((button) => {
+      const active = button.dataset.v2PlotView === state.plotView;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    const gridToggle = $("[data-v2-grid-toggle]");
+    if (gridToggle) { gridToggle.setAttribute("aria-pressed", String(state.showGrid)); gridToggle.classList.toggle("is-active", state.showGrid); }
+    $$('[data-v2-history]').forEach((button) => { button.disabled = button.dataset.v2History === "undo" ? history.length === 0 : future.length === 0; });
+    const editor = $("#v2ComponentEditor");
+    const item = selected();
+    editor.hidden = !item;
+    if (item) {
+      const type = HL.COMPONENT_TYPES[item.type];
+      const index = state.components.indexOf(item);
+      $("#v2EditorIcon").innerHTML = type.icon;
+      $("#v2EditorIcon").style.color = type.color;
+      $("#v2EditorTitle").textContent = type.label;
+      $("#v2EditorHelp").textContent = `Posição ${index + 1} de ${state.components.length}. ${type.resource}.`;
+      const input = $("#v2CompositionAreaInput");
+      input.value = item.area.toFixed(1);
+      input.max = Math.max(0, Math.round((current.area - total + item.area) * 10) / 10);
+      $$('[data-v2-move]').forEach((button) => { button.disabled = (button.dataset.v2Move === "-1" && index === 0) || (button.dataset.v2Move === "1" && index === state.components.length - 1); });
+    }
+  }
+
   function renderAll() { renderProgress(); renderEssentials(); renderScenarios(); renderLibrary(); renderComposition(); renderLayout(); renderActivities(); renderSummary(); }
 
   function addComponent(type) {
@@ -324,6 +380,7 @@
     const remaining = Math.round((current.area - areaTotal(state.components)) * 10) / 10;
     const item = HL.COMPONENT_TYPES[type];
     if (!item || remaining <= 0) { announce("Não há área livre neste cenário."); return; }
+    recordHistory();
     const area = Math.min(item.defaultArea, remaining);
     const id = uid(type);
     state.components.push({ id, type, area: Math.round(area * 10) / 10, position: positionFor(state.components.length, state.scenarioId) });
@@ -336,12 +393,17 @@
     if (!item) return;
     const other = areaTotal(state.components.filter((entry) => entry.id !== id));
     const max = Math.max(0, Math.round((scenario().area - other) * 10) / 10);
-    item.area = clamp(Math.round((Number(value) || 0) * 10) / 10, 0, max);
+    const nextArea = clamp(Math.round((Number(value) || 0) * 10) / 10, 0, max);
+    if (nextArea === item.area) return;
+    recordHistory();
+    item.area = nextArea;
     save(); renderAll();
   }
 
   function removeComponent(id) {
     const item = state.components.find((entry) => entry.id === id);
+    if (!item) return;
+    recordHistory();
     state.components = state.components.filter((entry) => entry.id !== id);
     if (state.selectedId === id) state.selectedId = null;
     save(true); renderAll(); announce(item ? `${HL.COMPONENT_TYPES[item.type].label} removido.` : "Zona removida.");
@@ -349,12 +411,46 @@
 
   function selectComponent(id) { if (!state.components.some((item) => item.id === id)) return; state.selectedId = id; save(); renderAll(); }
 
+  function moveComponent(delta) {
+    const index = state.components.findIndex((item) => item.id === state.selectedId);
+    const target = index + Number(delta);
+    if (index < 0 || target < 0 || target >= state.components.length) return;
+    recordHistory();
+    const next = [...state.components];
+    [next[index], next[target]] = [next[target], next[index]];
+    state.components = next;
+    save(true); renderAll();
+    announce(`Componente movido para ${target + 1} de ${next.length}.`);
+  }
+
+  function reorderComponent(sourceId, targetId) {
+    const sourceIndex = state.components.findIndex((item) => item.id === sourceId);
+    const targetIndex = state.components.findIndex((item) => item.id === targetId);
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return;
+    recordHistory();
+    const next = [...state.components];
+    const [moved] = next.splice(sourceIndex, 1);
+    next.splice(targetIndex, 0, moved);
+    state.components = next;
+    state.selectedId = moved.id;
+    save(true); renderAll();
+    announce(`${HL.COMPONENT_TYPES[moved.type].label} reposicionado na composição.`);
+  }
+
+  function toggleGrid() {
+    recordHistory();
+    state.showGrid = !state.showGrid;
+    save(); renderComposition();
+    announce(state.showGrid ? "Grade exibida." : "Grade ocultada.");
+  }
+
   function nudgeSelected(key) {
     const item = selected();
     if (!item) return;
     const size = gridSize();
     const delta = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[key];
     if (!delta) return;
+    recordHistory();
     item.position.x = clamp(Number(item.position.x || 0) + delta[0], 0, size.cols - 1);
     item.position.y = clamp(Number(item.position.y || 0) + delta[1], 0, size.rows - 1);
     save(true); renderLayout(); announce(`${HL.COMPONENT_TYPES[item.type].label} reposicionado.`);
@@ -367,7 +463,7 @@
 
   async function exportPlan() {
     await persistNow();
-    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "3.0.0", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
+    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.1.0", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
     announce("Plano JSON exportado.");
   }
 
@@ -399,6 +495,8 @@
 
   async function reset() {
     if (!window.confirm("Apagar o plano salvo neste dispositivo e começar novamente?")) return;
+    history = [];
+    future = [];
     state = defaultState();
     try { await DB.clear(); await persistNow(); renderAll(); announce("Plano apagado e reiniciado."); }
     catch (error) { announce(`Não foi possível reiniciar o SQLite: ${error.message}`); }
@@ -408,14 +506,43 @@
     $("#v2Essentials")?.addEventListener("input", (event) => { const field = event.target; if (field.name) { state.essentials[field.name] = field.type === "number" ? Number(field.value) : field.value; save(); if (state.step === 2) renderScenarios(); } });
     $("#v2Scenarios")?.addEventListener("click", (event) => { const button = event.target.closest("[data-v2-scenario]"); if (button) selectScenario(button.dataset.v2Scenario); });
     $("#v2Library")?.addEventListener("click", (event) => { const button = event.target.closest("[data-v2-add]"); if (button) addComponent(button.dataset.v2Add); });
-    $("#v2ComponentList")?.addEventListener("click", (event) => { const select = event.target.closest("[data-v2-select]"); const remove = event.target.closest("[data-v2-remove]"); if (select) selectComponent(select.dataset.v2Select); if (remove) removeComponent(remove.dataset.v2Remove); });
-    $("#v2ComponentList")?.addEventListener("change", (event) => { if (event.target.matches("[data-v2-area]")) updateArea(event.target.dataset.v2Area, event.target.value); });
+    const plotGrid = $("#v2PlotGrid");
+    plotGrid?.addEventListener("click", (event) => { const button = event.target.closest("[data-v2-select]"); if (button) selectComponent(button.dataset.v2Select); });
+    plotGrid?.addEventListener("dragstart", (event) => {
+      const item = event.target.closest("[data-v2-component-id]");
+      if (!item) return;
+      draggedId = item.dataset.v2ComponentId;
+      item.classList.add("is-dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", draggedId);
+    });
+    plotGrid?.addEventListener("dragover", (event) => {
+      if (!draggedId || !event.target.closest("[data-v2-component-id]")) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+    });
+    plotGrid?.addEventListener("drop", (event) => {
+      const target = event.target.closest("[data-v2-component-id]");
+      if (!target || !draggedId) return;
+      event.preventDefault();
+      reorderComponent(draggedId, target.dataset.v2ComponentId);
+      draggedId = null;
+    });
+    plotGrid?.addEventListener("dragend", () => {
+      draggedId = null;
+      $$(".is-dragging", plotGrid).forEach((item) => item.classList.remove("is-dragging"));
+    });
+    $("#v2ComponentEditor")?.addEventListener("change", (event) => { if (event.target.id === "v2CompositionAreaInput" && state.selectedId) updateArea(state.selectedId, event.target.value); });
+    $("#v2ComponentEditor")?.addEventListener("click", (event) => { const move = event.target.closest("[data-v2-move]"); if (move) moveComponent(move.dataset.v2Move); if (event.target.closest("#v2RemoveComponent") && state.selectedId) removeComponent(state.selectedId); });
+    $(".v2-view-switch")?.addEventListener("click", (event) => { const button = event.target.closest("[data-v2-plot-view]"); if (button) { state.plotView = button.dataset.v2PlotView === "list" ? "list" : "map"; save(); renderComposition(); } });
+    $("[data-v2-grid-toggle]")?.addEventListener("click", toggleGrid);
+    $$('[data-v2-history]').forEach((button) => button.addEventListener("click", () => button.dataset.v2History === "undo" ? undo() : redo()));
     $("#v2LayoutList")?.addEventListener("click", (event) => { const button = event.target.closest("[data-v2-layout-select]"); if (button) selectComponent(button.dataset.v2LayoutSelect); });
     $("#v2LayoutList")?.parentElement?.addEventListener("click", (event) => { const button = event.target.closest("[data-v2-nudge]"); if (button) nudgeSelected(button.dataset.v2Nudge); });
     $("#v2RemoveSelected")?.addEventListener("click", () => { if (state.selectedId) removeComponent(state.selectedId); });
-    $("#v2Rotate")?.addEventListener("click", () => { state.rotation = state.rotation ? 0 : 1; save(true); renderLayout(); announce("Vista girada."); });
-    $("#v2ZoomIn")?.addEventListener("click", () => { state.zoom = clamp(Math.round((state.zoom + .1) * 10) / 10, .85, 1.15); save(); renderLayout(); });
-    $("#v2ZoomOut")?.addEventListener("click", () => { state.zoom = clamp(Math.round((state.zoom - .1) * 10) / 10, .85, 1.15); save(); renderLayout(); });
+    $("#v2Rotate")?.addEventListener("click", () => { recordHistory(); state.rotation = state.rotation ? 0 : 1; save(true); renderLayout(); announce("Vista girada."); });
+    $("#v2ZoomIn")?.addEventListener("click", () => { recordHistory(); state.zoom = clamp(Math.round((state.zoom + .1) * 10) / 10, .85, 1.15); save(); renderLayout(); });
+    $("#v2ZoomOut")?.addEventListener("click", () => { recordHistory(); state.zoom = clamp(Math.round((state.zoom - .1) * 10) / 10, .85, 1.15); save(); renderLayout(); });
     $("#v2Activities")?.addEventListener("change", (event) => { if (event.target.matches("input")) { state.activities = $$('input:checked', $("#v2Activities")).map((input) => input.value); save(); } });
     $("#v2Note")?.addEventListener("input", (event) => { state.note = event.target.value.slice(0, 400); save(); });
     $("#v2Print")?.addEventListener("click", () => window.print());
@@ -433,6 +560,7 @@
   async function init() {
     bindEvents();
     renderAll();
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("./service-worker.js").catch(() => undefined);
     setStorageStatus("SQLite local · conectando", "loading");
     try {
       await DB.ready();

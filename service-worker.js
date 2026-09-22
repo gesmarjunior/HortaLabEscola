@@ -1,4 +1,4 @@
-const CACHE_NAME = "hortalab-escola-v2-0-0";
+const CACHE_NAME = "hortalab-escola-v2-1-0";
 const APP_SHELL = [
   "./", "./index.html", "./cartilha.html", "./manifest.webmanifest",
   "./css/styles.css", "./css/simulator.css", "./css/cartilha.css", "./css/print.css",

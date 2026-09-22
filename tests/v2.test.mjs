@@ -32,7 +32,8 @@ test("a composição de 50 m² preserva as cinco parcelas acadêmicas", async ()
 
 test("o layout usa componentes editáveis e controles acessíveis", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
-  assert.match(html, /id="v2CompositionCanvas"/);
+  assert.match(html, /id="v2PlotGrid"/);
+  assert.match(html, /id="v2ComponentEditor"/);
   assert.match(html, /id="v2IsoCanvas"/);
   assert.match(html, /data-v2-nudge="ArrowUp"/);
   assert.match(html, /aria-label="Mover para a direita"/);

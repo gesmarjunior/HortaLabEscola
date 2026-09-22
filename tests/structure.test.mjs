@@ -6,7 +6,7 @@ test("a versão oficial contém a jornada curta e Layout depois de Composição"
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   assert.equal((html.match(/class="v2-step" data-v2-panel=/g) || []).length, 6);
   assert.match(html, /data-v2-panel="3"[\s\S]*data-v2-panel="4"/);
-  for (const id of ["v2CompositionCanvas", "v2IsoCanvas", "v2Export", "v2ExportSqlite", "v2ImportFile", "v2StorageStatus"]) assert.match(html, new RegExp(`id="${id}"`));
+  for (const id of ["v2PlotGrid", "v2ComponentEditor", "v2IsoCanvas", "v2Export", "v2ExportSqlite", "v2ImportFile", "v2StorageStatus"]) assert.match(html, new RegExp(`id="${id}"`));
   assert.match(html, /data-v2-nudge="ArrowRight"/);
   assert.match(html, /sql-wasm\.js/);
   assert.match(html, /js\/local-db\.js/);

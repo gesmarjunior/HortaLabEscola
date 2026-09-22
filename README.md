@@ -4,7 +4,7 @@ Produto educacional estático para apoiar professores e gestores no planejamento
 
 ## Versão oficial e histórico
 
-O produto possui uma única entrada oficial em `index.html`. A jornada foi simplificada para seis etapas e inclui a aba `Layout` logo depois de `Composição`, com montagem isométrica interativa, seleção, remoção, rotação, zoom e reposicionamento acessível por teclado.
+O produto possui uma única entrada oficial em `index.html`. Na versão `2.1.0`, a jornada simplificada mantém a composição 2D antes da aba `Layout`: o usuário escolhe os componentes no catálogo, organiza o mapa e então configura o mesmo conjunto na montagem isométrica, com seleção, remoção, rotação, zoom e reposicionamento acessível por teclado.
 
 A versão anterior não foi apagada do histórico: a tag Git `v1-atual` aponta para o estado anterior do projeto. Assim, o GitHub mantém versionamento real sem criar duas aplicações concorrentes no site publicado.
 
@@ -13,7 +13,7 @@ A versão anterior não foi apagada do histórico: a tag Git `v1-atual` aponta p
 - jornada guiada em seis etapas;
 - diagnóstico sem dados pessoais;
 - cenários comparativos de 12, 25 e 50 m²;
-- simulador de composição com mapa, lista, arrastar e soltar e comandos equivalentes por botão/teclado;
+- simulador de composição 2D com catálogo, mapa proporcional, lista, grade, inspetor, desfazer/refazer, arrastar e soltar e comandos equivalentes por botão/teclado;
 - total de área validado em tempo real;
 - layout isométrico de alta qualidade gráfica com zonas selecionáveis;
 - planejamento curricular e atividades selecionáveis;
@@ -56,11 +56,13 @@ Os testes verificam:
 - exportação/importação JSON e SQLite;
 - cobertura temática da cartilha;
 - ausência de scripts, fontes e imagens remotas;
+- composição 2D, inspetor, mapa/lista, grade, desfazer/refazer e arrastar e soltar;
+- passagem do conjunto escolhido para o layout isométrico;
 - jornada no navegador, console, impressão e responsividade em 360, 768, 1024 e 1440 px.
 
 O teste de interface usa `playwright-core` como dependência de desenvolvimento e o Chrome ou Edge já instalado, sem baixar outro navegador. Ele percorre a jornada, valida a persistência após recarregar, gera os arquivos de exportação e salva capturas de QA em `%TEMP%\hortalab-escola-qa`.
 
-As capturas revisadas também ficam versionadas em `screenshots/layout-desktop-v2.png` e `screenshots/layout-mobile-v2.png`.
+As capturas revisadas também ficam versionadas em `screenshots/composition-desktop-v2.png`, `screenshots/composition-mobile-v2.png`, `screenshots/layout-desktop-v2.png` e `screenshots/layout-mobile-v2.png`.
 
 ## Estrutura
 
@@ -90,7 +92,7 @@ Nenhum dado é enviado a servidores. O plano é salvo em um banco SQLite no pró
 
 Todos os recursos necessários estão no projeto. Após a primeira visita por HTTP(S), o service worker mantém o conjunto principal em cache. Ao abrir por um servidor local, o produto também funciona sem internet. A aplicação não depende do service worker para iniciar.
 
-Ao publicar uma nova versão, incremente `CACHE_NAME` em `service-worker.js` (por exemplo, de `hortalab-escola-v2-0-0` para `hortalab-escola-v2-0-1`); a ativação remove caches antigos e passa a servir o conjunto atualizado.
+Ao publicar uma nova versão, incremente `CACHE_NAME` em `service-worker.js` (por exemplo, de `hortalab-escola-v2-1-0` para `hortalab-escola-v2-1-1`); a ativação remove caches antigos e passa a servir o conjunto atualizado.
 
 ## Acessibilidade
 
