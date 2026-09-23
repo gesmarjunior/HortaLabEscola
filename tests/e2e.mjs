@@ -67,18 +67,36 @@ await page.screenshot({ path: join(qaDir, "composition-desktop.png"), fullPage: 
 await page.locator('[data-v2-panel="3"] [data-v2-next]').click();
 check(await page.locator("#v2IsoCanvas").isVisible(), "O layout isométrico não está visível.");
 check(await page.locator("#v2IsoCanvas .iso-hit").count() === 11, "A cena não renderizou todos os componentes.");
-for (const selector of [".iso-water-tank", ".iso-water-tap", ".iso-water-hose", ".iso-nursery-bench", ".iso-tool-rack", ".iso-compost-bin", ".iso-learning-table", ".iso-observation-bench"]) {
-  check(await page.locator(`#v2IsoCanvas ${selector}`).count() > 0, `O objeto isométrico ${selector} não foi renderizado.`);
+for (const type of ["bed", "paths", "maneuver", "water", "seedlings", "tools", "compost", "pedagogy", "observation"]) {
+  const sprite = page.locator(`#v2IsoCanvas [data-iso-type="${type}"] .iso-sprite`).first();
+  check(await sprite.count() > 0, `O PNG isométrico de ${type} não foi renderizado.`);
+  check((await sprite.getAttribute("href"))?.endsWith(`/${type}.png`), `O PNG isométrico de ${type} tem origem incorreta.`);
 }
 const waterObject = page.locator('#v2IsoCanvas [data-iso-type="water"]');
+const positionInCanvas = (locator) => locator.evaluate((element) => {
+  const objectBox = element.getBoundingClientRect();
+  const canvasBox = element.closest("svg").getBoundingClientRect();
+  return { x: objectBox.x - canvasBox.x, y: objectBox.y - canvasBox.y };
+});
 await waterObject.focus();
 await waterObject.press("Enter");
+const waterBefore = await positionInCanvas(waterObject);
+await waterObject.press("ArrowLeft");
+const waterLeft = await positionInCanvas(waterObject);
+check(waterLeft.x < waterBefore.x - 20 && Math.abs(waterLeft.y - waterBefore.y) < 1, "A seta esquerda não moveu a água visualmente para a esquerda.");
+check((await text("#v2Live")).includes("Ponto de água movido para esquerda"), "O movimento por teclado não atualizou o feedback.");
 await waterObject.press("ArrowRight");
-check((await text("#v2Live")).includes("Ponto de água reposicionado"), "O objeto de água não respondeu à seleção e ao movimento por teclado.");
-await page.locator('[data-v2-layout-select]').first().click();
-await page.locator('[data-v2-nudge="ArrowRight"]').click();
+const waterReturned = await positionInCanvas(waterObject);
+check(waterReturned.x > waterLeft.x + 20 && Math.abs(waterReturned.y - waterLeft.y) < 1, "A seta direita não devolveu a água visualmente para a direita.");
 await page.locator("#v2Rotate").click();
 check((await text("#v2Live")).includes("Vista girada"), "A rotação não atualizou o feedback.");
+const rotatedBefore = await positionInCanvas(waterObject);
+await waterObject.press("ArrowLeft");
+const rotatedLeft = await positionInCanvas(waterObject);
+check(rotatedLeft.x < rotatedBefore.x - 20 && Math.abs(rotatedLeft.y - rotatedBefore.y) < 1, "A seta esquerda ficou invertida depois de girar a vista.");
+await waterObject.press("ArrowRight");
+const rotatedReturned = await positionInCanvas(waterObject);
+check(rotatedReturned.x > rotatedLeft.x + 20 && Math.abs(rotatedReturned.y - rotatedLeft.y) < 1, "A seta direita ficou invertida depois de girar a vista.");
 
 await page.locator('[data-v2-panel="4"] [data-v2-next]').click();
 await page.locator("#v2Activities input").first().check();

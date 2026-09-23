@@ -260,14 +260,28 @@
     vacation: "férias e recessos", access: "acessibilidade", security: "segurança"
   };
 
+  // Direções na tela isométrica. Cada movimento combina os dois eixos da
+  // grade para que as setas correspondam à direção visual percebida.
+  const VISUAL_NUDGE_DELTAS = {
+    0: {
+      ArrowUp: [-1, -1], ArrowDown: [1, 1],
+      ArrowLeft: [-1, 1], ArrowRight: [1, -1]
+    },
+    1: {
+      ArrowUp: [-1, -1], ArrowDown: [1, 1],
+      ArrowLeft: [1, -1], ArrowRight: [-1, 1]
+    }
+  };
+
   window.HortaLab = window.HortaLab || {};
   Object.assign(window.HortaLab, {
-    APP_VERSION: "1.0.0",
+    APP_VERSION: "2.3.0",
     COMPONENT_TYPES,
     SCENARIOS,
     CURRICULAR,
     ACTIVITIES,
     EVENTS,
-    LIMITATION_LABELS
+    LIMITATION_LABELS,
+    VISUAL_NUDGE_DELTAS
   });
 }());

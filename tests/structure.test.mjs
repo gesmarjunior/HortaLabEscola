@@ -10,8 +10,8 @@ test("a versão oficial contém a jornada curta e Layout depois de Composição"
   assert.match(html, /data-v2-nudge="ArrowRight"/);
   assert.match(html, /sql-wasm\.js/);
   assert.match(html, /js\/local-db\.js/);
-  assert.match(html, /css\/planner\.css\?v=2\.2\.0/);
-  assert.match(html, /js\/planner\.js\?v=2\.2\.0/);
+  assert.match(html, /css\/planner\.css\?v=2\.3\.0/);
+  assert.match(html, /js\/planner\.js\?v=2\.3\.0/);
 });
 
 test("o SQLite local possui schema e não usa localStorage", async () => {
@@ -33,6 +33,10 @@ test("o banco incorporado é local e a aplicação não referencia recursos remo
   }
   const wasm = await readFile(new URL("../assets/vendor/sql-wasm.wasm", import.meta.url));
   assert.ok(wasm.byteLength > 500000, "o binário SQLite local parece incompleto");
+  const worker = await readFile(new URL("../service-worker.js", import.meta.url), "utf8");
+  for (const type of ["bed", "container", "paths", "maneuver", "water", "seedlings", "tools", "compost", "pedagogy", "observation", "signage"]) {
+    assert.match(worker, new RegExp(`assets/images/isometric/${type}\\.png`), type);
+  }
 });
 
 test("a cartilha cobre os tópicos obrigatórios", async () => {

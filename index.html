@@ -9,7 +9,7 @@
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/planner.css?v=2.2.0">
+  <link rel="stylesheet" href="css/planner.css?v=2.3.0">
   <link rel="stylesheet" href="css/print.css" media="print">
 </head>
 <body class="v2-body">
@@ -111,7 +111,7 @@
             <div class="v2-layout-meter"><div class="v2-meter-label"><span>Uso da área</span><strong id="v2LayoutPercent">0%</strong></div><div class="v2-area-meter"><span id="v2LayoutMeter"></span></div></div>
             <div class="v2-panel-heading v2-panel-heading-spaced"><h3>Componentes</h3><span id="v2LayoutCount">0 itens</span></div>
             <ul id="v2LayoutList" class="v2-layout-list"></ul>
-            <div class="v2-selected-actions"><strong id="v2SelectedTitle">Selecione uma zona</strong><span id="v2SelectedHelp">Clique em um item da cena ou da lista.</span><div class="v2-nudge-actions" aria-label="Reposicionar zona"><button type="button" data-v2-nudge="ArrowUp" aria-label="Mover para cima">↑</button><button type="button" data-v2-nudge="ArrowLeft" aria-label="Mover para a esquerda">←</button><button type="button" data-v2-nudge="ArrowDown" aria-label="Mover para baixo">↓</button><button type="button" data-v2-nudge="ArrowRight" aria-label="Mover para a direita">→</button></div><div><button class="button button-danger button-small" id="v2RemoveSelected" type="button" disabled>Remover</button></div></div>
+            <div class="v2-selected-actions"><strong id="v2SelectedTitle">Selecione uma zona</strong><span id="v2SelectedHelp">Clique em um item da cena ou da lista.</span><div class="v2-nudge-actions" aria-label="Controle direcional para reposicionar zona"><button type="button" data-v2-nudge="ArrowUp" aria-label="Mover visualmente para cima"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><button type="button" data-v2-nudge="ArrowLeft" aria-label="Mover visualmente para a esquerda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><button type="button" data-v2-nudge="ArrowDown" aria-label="Mover visualmente para baixo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button><button type="button" data-v2-nudge="ArrowRight" aria-label="Mover visualmente para a direita"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div><div><button class="button button-danger button-small" id="v2RemoveSelected" type="button" disabled>Remover</button></div></div>
           </aside>
           <div class="v2-iso-stage v2-panel">
             <div class="v2-stage-toolbar"><div><strong>Vista de jogo</strong><span>Use Tab e Enter para navegar pelos itens.</span></div><div class="v2-stage-actions"><button type="button" class="icon-button" id="v2Rotate" aria-label="Girar vista">↻</button><button type="button" class="icon-button" id="v2ZoomOut" aria-label="Diminuir zoom">−</button><button type="button" class="icon-button" id="v2ZoomIn" aria-label="Aumentar zoom">+</button></div></div>
@@ -144,6 +144,6 @@
   <script src="assets/vendor/sql-wasm.js" defer></script>
   <script src="js/data.js" defer></script>
   <script src="js/local-db.js" defer></script>
-  <script src="js/planner.js?v=2.2.0" defer></script>
+  <script src="js/planner.js?v=2.3.0" defer></script>
 </body>
 </html>

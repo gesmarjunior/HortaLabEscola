@@ -4,7 +4,7 @@ Produto educacional estático para apoiar professores e gestores no planejamento
 
 ## Versão oficial e histórico
 
-O produto possui uma única entrada oficial em `index.html`. Na versão `2.2.0`, a jornada simplificada mantém a composição 2D antes da aba `Layout`: o usuário escolhe os componentes no catálogo, organiza o mapa e então configura o mesmo conjunto na montagem isométrica, com seleção, remoção, rotação, zoom e reposicionamento acessível por teclado. Os objetos isométricos possuem ilustrações vetoriais próprias e reconhecíveis — incluindo reservatório com torneira e mangueira, viveiro de mudas, composteira, banco de observação e armário de ferramentas — sem depender de imagens externas.
+O produto possui uma única entrada oficial em `index.html`. Na versão `2.3.0`, a jornada simplificada mantém a composição 2D antes da aba `Layout`: o usuário escolhe os componentes no catálogo, organiza o mapa e então configura o mesmo conjunto na montagem isométrica, com seleção, remoção, rotação, zoom e reposicionamento acessível por teclado. A cena usa onze peças 3D originais em PNG transparente — incluindo reservatório com torneira e mangueira, viveiro de mudas, composteira, banco de observação e armário de ferramentas — armazenadas no próprio projeto e disponíveis offline. O controle direcional acompanha a direção visual da tela, inclusive após girar a vista.
 
 A versão anterior não foi apagada do histórico: a tag Git `v1-atual` aponta para o estado anterior do projeto. Assim, o GitHub mantém versionamento real sem criar duas aplicações concorrentes no site publicado.
 

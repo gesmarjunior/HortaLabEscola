@@ -104,8 +104,14 @@
 .v2-selected-actions { display: grid; gap: .35rem; margin: .6rem; padding: .8rem; border: 1px dashed var(--v2-line); background: #fff; }
 .v2-selected-actions strong { font-size: .82rem; }
 .v2-selected-actions span { color: var(--v2-muted); font-size: .75rem; line-height: 1.4; }
-.v2-nudge-actions { display: grid; grid-template-columns: repeat(4, 1.9rem); gap: .3rem; }
-.v2-nudge-actions button { width: 1.9rem; height: 1.75rem; border: 1px solid var(--v2-line); border-radius: 6px; background: #fff; color: var(--v2-green); font: inherit; font-weight: 800; cursor: pointer; }
+.v2-nudge-actions { position: relative; display: grid; grid-template: repeat(3, 2rem) / repeat(3, 2rem); gap: .2rem; width: max-content; margin-top: .25rem; }
+.v2-nudge-actions::before { content: ""; grid-area: 2 / 2; width: .42rem; height: .42rem; place-self: center; border-radius: 50%; background: var(--v2-line); box-shadow: 0 0 0 5px #f5f7f3; }
+.v2-nudge-actions button { display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 1px solid var(--v2-line); border-radius: 8px; background: #fff; color: var(--v2-green); cursor: pointer; box-shadow: 0 2px 5px rgba(36,48,43,.08); }
+.v2-nudge-actions button[data-v2-nudge="ArrowUp"] { grid-area: 1 / 2; }
+.v2-nudge-actions button[data-v2-nudge="ArrowLeft"] { grid-area: 2 / 1; }
+.v2-nudge-actions button[data-v2-nudge="ArrowDown"] { grid-area: 3 / 2; }
+.v2-nudge-actions button[data-v2-nudge="ArrowRight"] { grid-area: 2 / 3; }
+.v2-nudge-actions svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
 .v2-nudge-actions button:hover, .v2-nudge-actions button:focus-visible { border-color: var(--v2-green); background: var(--v2-leaf-soft); }
 .v2-iso-stage { min-width: 0; overflow: hidden; }
 .v2-stage-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 1rem; border-bottom: 1px solid var(--v2-line); }
@@ -123,7 +129,7 @@
 #v2IsoCanvas .iso-label { paint-order: stroke; stroke: rgba(255,255,255,.96); stroke-width: 4px; stroke-linejoin: round; fill: var(--v2-ink); font-size: 11px; font-weight: 800; pointer-events: none; }
 .iso-object { pointer-events: none; transform-box: fill-box; transform-origin: center bottom; transition: transform .18s ease, filter .18s ease; }
 #v2IsoCanvas .iso-hit:hover .iso-object, #v2IsoCanvas .iso-hit:focus .iso-object { transform: translateY(-2px); filter: saturate(1.06) brightness(1.02); }
-.iso-crop, .iso-water-drop { transform-box: fill-box; transform-origin: center bottom; }
+.iso-sprite { image-rendering: auto; }
 .iso-world { isolation: isolate; }
 .v2-stage-legend { display: flex; flex-wrap: wrap; gap: .75rem 1.2rem; padding: .75rem 1rem; border-top: 1px solid var(--v2-line); color: var(--v2-muted); font-size: .72rem; }
 .legend-dot { display: inline-block; width: .55rem; height: .55rem; margin-right: .35rem; border-radius: 50%; vertical-align: middle; }

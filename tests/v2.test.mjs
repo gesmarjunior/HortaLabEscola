@@ -36,15 +36,34 @@ test("o layout usa componentes editáveis e controles acessíveis", async () => 
   assert.match(html, /id="v2ComponentEditor"/);
   assert.match(html, /id="v2IsoCanvas"/);
   assert.match(html, /data-v2-nudge="ArrowUp"/);
-  assert.match(html, /aria-label="Mover para a direita"/);
+  assert.match(html, /aria-label="Mover visualmente para a direita"/);
 });
 
-test("cada componente possui uma representação isométrica específica", async () => {
+test("as setas sempre correspondem à direção visual da vista isométrica", async () => {
+  const data = await loadData();
+  const projectDelta = ([dx, dy], rotation) => {
+    const viewX = rotation ? dy : dx;
+    const viewY = rotation ? dx : dy;
+    return [viewX - viewY, viewX + viewY];
+  };
+  for (const rotation of [0, 1]) {
+    const deltas = data.VISUAL_NUDGE_DELTAS[rotation];
+    assert.deepEqual(projectDelta(deltas.ArrowUp, rotation), [0, -2]);
+    assert.deepEqual(projectDelta(deltas.ArrowDown, rotation), [0, 2]);
+    assert.deepEqual(projectDelta(deltas.ArrowLeft, rotation), [-2, 0]);
+    assert.deepEqual(projectDelta(deltas.ArrowRight, rotation), [2, 0]);
+  }
+});
+
+test("cada componente possui um PNG 3D transparente e otimizado", async () => {
   const source = await readFile(new URL("../js/planner.js", import.meta.url), "utf8");
-  for (const marker of [
-    'wrap("bed"', 'wrap("container"', 'wrap("paths"', "iso-access-symbol",
-    "iso-water-tank", "iso-water-tap", "iso-water-hose", "iso-nursery-bench",
-    "iso-tool-rack", "iso-compost-bin", "iso-learning-table",
-    "iso-observation-bench", "iso-signpost"
-  ]) assert.ok(source.includes(marker), marker);
+  assert.match(source, /class="iso-sprite"/);
+  for (const type of ["bed", "container", "paths", "maneuver", "water", "seedlings", "tools", "compost", "pedagogy", "observation", "signage"]) {
+    const png = await readFile(new URL(`../assets/images/isometric/${type}.png`, import.meta.url));
+    assert.equal(png.subarray(1, 4).toString("ascii"), "PNG", type);
+    assert.equal(png.readUInt32BE(16), 384, `${type}: largura`);
+    assert.equal(png.readUInt32BE(20), 384, `${type}: altura`);
+    assert.equal(png[25], 6, `${type}: PNG deve preservar canal alfa RGBA`);
+    assert.ok(png.byteLength < 250000, `${type}: arquivo maior que 250 KB`);
+  }
 });

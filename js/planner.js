@@ -261,6 +261,28 @@
     return `${outline}<g class="iso-object iso-object-generic">${shadow}</g>`;
   }
 
+  const ISO_SPRITES = {
+    bed: { width: 96, height: 96 },
+    container: { width: 80, height: 94 },
+    paths: { width: 98, height: 82 },
+    maneuver: { width: 88, height: 78 },
+    water: { width: 90, height: 108 },
+    seedlings: { width: 98, height: 100 },
+    tools: { width: 92, height: 104 },
+    compost: { width: 88, height: 100 },
+    pedagogy: { width: 98, height: 92 },
+    observation: { width: 102, height: 90 },
+    signage: { width: 80, height: 104 }
+  };
+
+  function spriteFor(type, x, y) {
+    const config = ISO_SPRITES[type];
+    if (!config) return artFor(type, x, y, "layout");
+    const [cx, cy] = isoPoint(x + .72, y + .48, .02);
+    const bottom = cy + 24;
+    return `<polygon class="iso-outline" points="${tilePolygon(x, y, .01)}"/><g class="iso-object iso-object-${type}"><image class="iso-sprite" href="assets/images/isometric/${type}.png" x="${cx - config.width / 2}" y="${bottom - config.height}" width="${config.width}" height="${config.height}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"/></g>`;
+  }
+
   function renderIsoInto(svg, interactive = true) {
     if (!svg) return;
     const size = gridSize();
@@ -285,11 +307,14 @@
       if (!Number.isFinite(x) || !Number.isFinite(y)) { x = index % size.cols; y = Math.floor(index / size.cols); }
       if (state.rotation === 1) { const swap = x; x = y; y = swap; }
       x = clamp(x, 0, size.cols - 1); y = clamp(y, 0, size.rows - 1);
+      return { item, index, x, y, depth: x + y };
+    }).sort((a, b) => a.depth - b.depth || a.y - b.y || a.index - b.index).map(({ item, x, y }) => {
       const type = HL.COMPONENT_TYPES[item.type];
       const point = isoPoint(x, y, .03);
       const label = `${type.label}, ${formatArea(item.area)} m²`;
-      const labelMarkup = interactive && item.id === state.selectedId ? `<text class="iso-label" x="${point[0]}" y="${point[1] - 32}" text-anchor="middle">${escapeHtml(type.short)}</text>` : "";
-      return `<g class="iso-hit${interactive && item.id === state.selectedId ? " is-selected" : ""}" data-iso-id="${item.id}" data-iso-type="${item.type}"${interactive ? ' tabindex="0" role="button"' : ""} aria-label="${label}">${artFor(item.type, x, y, prefix)}${labelMarkup}</g>`;
+      const labelLift = (ISO_SPRITES[item.type]?.height || 70) - 20;
+      const labelMarkup = interactive && item.id === state.selectedId ? `<text class="iso-label" x="${point[0]}" y="${point[1] - labelLift}" text-anchor="middle">${escapeHtml(type.short)}</text>` : "";
+      return `<g class="iso-hit${interactive && item.id === state.selectedId ? " is-selected" : ""}" data-iso-id="${item.id}" data-iso-type="${item.type}"${interactive ? ' tabindex="0" role="button"' : ""} aria-label="${label}">${spriteFor(item.type, x, y)}${labelMarkup}</g>`;
     }).join("");
     svg.innerHTML = `${svgDefs(prefix)}<title id="${prefix === "layout" ? "v2IsoTitle" : "v2CompositionTitle"}">${interactive ? "Montagem isométrica da horta" : "Prévia da composição"}</title><desc id="${prefix === "layout" ? "v2IsoDesc" : "v2CompositionDesc"}">${scenario().name}, ${scenario().area} metros quadrados, com ${state.components.length} componentes.</desc><g class="iso-world">${terrain.join("")}${boundary}${objects}</g>`;
     if (!interactive) return;
@@ -313,7 +338,7 @@
     $("#v2LayoutCount").textContent = `${state.components.length} ${state.components.length === 1 ? "item" : "itens"}`;
     $("#v2LayoutList").innerHTML = state.components.map((item) => { const type = HL.COMPONENT_TYPES[item.type]; return `<li><button type="button" class="${item.id === state.selectedId ? "is-selected" : ""}" data-v2-layout-select="${item.id}"><span class="v2-component-icon" style="color:${type.color}" aria-hidden="true">${type.icon}</span><span>${type.short}</span><small>${formatArea(item.area)} m²</small></button></li>`; }).join("");
     $("#v2SelectedTitle").textContent = selectedItem ? HL.COMPONENT_TYPES[selectedItem.type].label : "Selecione uma zona";
-    $("#v2SelectedHelp").textContent = selectedItem ? "Use as setas para reposicionar no terreno." : "Clique em um item da cena ou da lista.";
+    $("#v2SelectedHelp").textContent = selectedItem ? "Use o direcional ou as setas do teclado. A peça segue a direção vista na tela." : "Clique em um item da cena ou da lista.";
     $("#v2RemoveSelected").disabled = !selectedItem;
     renderIsoInto($("#v2IsoCanvas"), true);
   }
@@ -460,12 +485,19 @@
     const item = selected();
     if (!item) return;
     const size = gridSize();
-    const delta = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[key];
+    const delta = HL.VISUAL_NUDGE_DELTAS?.[state.rotation]?.[key];
     if (!delta) return;
+    const nextX = Number(item.position.x || 0) + delta[0];
+    const nextY = Number(item.position.y || 0) + delta[1];
+    if (nextX < 0 || nextX >= size.cols || nextY < 0 || nextY >= size.rows) {
+      announce("Limite do terreno: a peça não pode avançar nessa direção.");
+      return;
+    }
     recordHistory();
-    item.position.x = clamp(Number(item.position.x || 0) + delta[0], 0, size.cols - 1);
-    item.position.y = clamp(Number(item.position.y || 0) + delta[1], 0, size.rows - 1);
-    save(true); renderLayout(); announce(`${HL.COMPONENT_TYPES[item.type].label} reposicionado.`);
+    item.position.x = nextX;
+    item.position.y = nextY;
+    const direction = { ArrowUp: "cima", ArrowDown: "baixo", ArrowLeft: "esquerda", ArrowRight: "direita" }[key];
+    save(true); renderLayout(); announce(`${HL.COMPONENT_TYPES[item.type].label} movido para ${direction}.`);
   }
 
   function downloadBlob(blob, filename) {
@@ -475,7 +507,7 @@
 
   async function exportPlan() {
     await persistNow();
-    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.2.0", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
+    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.3.0", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
     announce("Plano JSON exportado.");
   }
 
