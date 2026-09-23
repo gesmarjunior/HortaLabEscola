@@ -4,9 +4,9 @@ Produto educacional estático para apoiar professores e gestores no planejamento
 
 ## Versão oficial e histórico
 
-O produto possui uma única entrada oficial em `index.html`. Na versão `2.4.0`, a linguagem foi revisada para professores da educação básica e a jornada passou a acompanhar as tarefas previstas no projeto acadêmico: conhecer a realidade da escola, comparar tamanhos, escolher os espaços, organizar a maquete 3D, planejar aulas e cuidados, testar imprevistos e preparar o plano final. Termos técnicos de informática foram retirados da interface principal, sem eliminar o salvamento local, as exportações ou as regras determinísticas. A cena continua usando onze peças 3D originais em PNG transparente e o controle direcional acompanha a direção visual da tela, inclusive após girar a vista.
+O produto possui uma única entrada oficial em `index.html`. Na versão `2.4.1`, a linguagem está voltada a professores da educação básica e a jornada acompanha as tarefas previstas no projeto acadêmico: conhecer a realidade da escola, comparar tamanhos, escolher os espaços, organizar a maquete 3D, planejar aulas e cuidados, testar imprevistos e preparar o plano final. A atualização `2.4.1` amplia a área de clique/toque dos objetos 3D, ativa os controles de movimento somente após uma seleção e mostra o tamanho atual da imagem. Termos técnicos de informática permanecem fora da interface principal, sem eliminar o salvamento local, as exportações ou as regras determinísticas.
 
-A versão anterior continua disponível na tag Git `v2.3.0`; versões ainda mais antigas permanecem no histórico do repositório. Assim, o GitHub mantém uma única aplicação publicada e permite voltar a qualquer versão marcada.
+A versão anterior continua disponível na tag Git `v2.4.0`; versões ainda mais antigas permanecem no histórico do repositório. Assim, o GitHub mantém uma única aplicação publicada e permite voltar a qualquer versão marcada.
 
 ## Funcionalidades
 

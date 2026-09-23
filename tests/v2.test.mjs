@@ -34,11 +34,17 @@ test("a composição de 50 m² preserva as cinco parcelas acadêmicas", async ()
 
 test("o layout usa componentes editáveis e controles acessíveis", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const source = await readFile(new URL("../js/planner.js", import.meta.url), "utf8");
+  const css = await readFile(new URL("../css/planner.css", import.meta.url), "utf8");
   assert.match(html, /id="v2PlotGrid"/);
   assert.match(html, /id="v2ComponentEditor"/);
   assert.match(html, /id="v2IsoCanvas"/);
+  assert.match(html, /id="v2ZoomStatus"/);
   assert.match(html, /data-v2-nudge="ArrowUp"/);
   assert.match(html, /aria-label="Mover visualmente para a direita"/);
+  assert.match(source, /class="iso-sprite"/);
+  assert.match(source, /aria-pressed=/);
+  assert.match(css, /\.iso-sprite[^}]*pointer-events:\s*visiblePainted/);
 });
 
 test("as setas sempre correspondem à direção visual da vista isométrica", async () => {

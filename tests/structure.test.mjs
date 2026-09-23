@@ -12,8 +12,8 @@ test("a versão oficial contém a jornada orientada de sete etapas", async () =>
   assert.match(html, /sql-wasm\.js/);
   assert.match(html, /js\/local-db\.js/);
   assert.match(html, /js\/rules\.js/);
-  assert.match(html, /css\/planner\.css\?v=2\.4\.0/);
-  assert.match(html, /js\/planner\.js\?v=2\.4\.0/);
+  assert.match(html, /css\/planner\.css\?v=2\.4\.1/);
+  assert.match(html, /js\/planner\.js\?v=2\.4\.1/);
 });
 
 test("a linguagem principal evita termos de programação", async () => {

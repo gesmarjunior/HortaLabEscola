@@ -337,7 +337,7 @@
       const label = `${type.label}, ${formatArea(item.area)} m²`;
       const labelLift = (ISO_SPRITES[item.type]?.height || 70) - 20;
       const labelMarkup = interactive && item.id === state.selectedId ? `<text class="iso-label" x="${point[0]}" y="${point[1] - labelLift}" text-anchor="middle">${escapeHtml(type.short)}</text>` : "";
-      return `<g class="iso-hit${interactive && item.id === state.selectedId ? " is-selected" : ""}" data-iso-id="${item.id}" data-iso-type="${item.type}"${interactive ? ' tabindex="0" role="button"' : ""} aria-label="${label}">${spriteFor(item.type, x, y)}${labelMarkup}</g>`;
+      return `<g class="iso-hit${interactive && item.id === state.selectedId ? " is-selected" : ""}" data-iso-id="${item.id}" data-iso-type="${item.type}"${interactive ? ` tabindex="0" role="button" aria-pressed="${item.id === state.selectedId}"` : ""} aria-label="${label}">${spriteFor(item.type, x, y)}${labelMarkup}</g>`;
     }).join("");
     svg.innerHTML = `${svgDefs(prefix)}<title id="${prefix === "layout" ? "v2IsoTitle" : "v2CompositionTitle"}">${interactive ? "Maquete 3D da horta" : "Prévia dos espaços escolhidos"}</title><desc id="${prefix === "layout" ? "v2IsoDesc" : "v2CompositionDesc"}">${scenario().name}, ${scenario().area} metros quadrados, com ${state.components.length} itens.</desc><g class="iso-world">${terrain.join("")}${boundary}${objects}</g>`;
     if (!interactive) return;
@@ -359,10 +359,14 @@
     $("#v2LayoutPercent").textContent = `${Math.round((total / current.area) * 100)}%`;
     $("#v2LayoutMeter").style.width = `${Math.min(100, (total / current.area) * 100)}%`;
     $("#v2LayoutCount").textContent = `${state.components.length} ${state.components.length === 1 ? "item" : "itens"}`;
-    $("#v2LayoutList").innerHTML = state.components.map((item) => { const type = HL.COMPONENT_TYPES[item.type]; return `<li><button type="button" class="${item.id === state.selectedId ? "is-selected" : ""}" data-v2-layout-select="${item.id}"><span class="v2-component-icon" style="color:${type.color}" aria-hidden="true">${type.icon}</span><span>${type.short}</span><small>${formatArea(item.area)} m²</small></button></li>`; }).join("");
+    $("#v2LayoutList").innerHTML = state.components.map((item) => { const type = HL.COMPONENT_TYPES[item.type]; return `<li><button type="button" class="${item.id === state.selectedId ? "is-selected" : ""}" data-v2-layout-select="${item.id}" aria-pressed="${item.id === state.selectedId}"><span class="v2-component-icon" style="color:${type.color}" aria-hidden="true">${type.icon}</span><span>${type.short}</span><small>${formatArea(item.area)} m²</small></button></li>`; }).join("");
     $("#v2SelectedTitle").textContent = selectedItem ? HL.COMPONENT_TYPES[selectedItem.type].label : "Escolha um item";
     $("#v2SelectedHelp").textContent = selectedItem ? "Use o controle com setas ou as setas do teclado. O item seguirá a direção mostrada na tela." : "Escolha um item na imagem ou na lista.";
+    $$('[data-v2-nudge]').forEach((button) => { button.disabled = !selectedItem; });
     $("#v2RemoveSelected").disabled = !selectedItem;
+    $("#v2ZoomStatus").textContent = `${Math.round(state.zoom * 100)}%`;
+    $("#v2ZoomOut").disabled = state.zoom <= .85;
+    $("#v2ZoomIn").disabled = state.zoom >= 1.15;
     renderIsoInto($("#v2IsoCanvas"), true);
   }
 
@@ -535,7 +539,13 @@
     save(true); renderAll(); announce(item ? `${HL.COMPONENT_TYPES[item.type].label} removido.` : "Zona removida.");
   }
 
-  function selectComponent(id) { if (!state.components.some((item) => item.id === id)) return; state.selectedId = id; save(); renderAll(); }
+  function selectComponent(id) {
+    const item = state.components.find((entry) => entry.id === id);
+    if (!item) return;
+    state.selectedId = id;
+    save(); renderAll();
+    announce(`${HL.COMPONENT_TYPES[item.type].label} selecionado.`);
+  }
 
   function moveComponent(delta) {
     const index = state.components.findIndex((item) => item.id === state.selectedId);
@@ -572,7 +582,7 @@
 
   function nudgeSelected(key) {
     const item = selected();
-    if (!item) return;
+    if (!item) { announce("Escolha primeiro um item da horta."); return; }
     const size = gridSize();
     const delta = HL.VISUAL_NUDGE_DELTAS?.[state.rotation]?.[key];
     if (!delta) return;
@@ -596,7 +606,7 @@
 
   async function exportPlan() {
     await persistNow();
-    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.4.0", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
+    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.4.1", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
     announce("Uma cópia do plano foi salva.");
   }
 
@@ -674,8 +684,8 @@
     $("#v2LayoutList")?.parentElement?.addEventListener("click", (event) => { const button = event.target.closest("[data-v2-nudge]"); if (button) nudgeSelected(button.dataset.v2Nudge); });
     $("#v2RemoveSelected")?.addEventListener("click", () => { if (state.selectedId) removeComponent(state.selectedId); });
     $("#v2Rotate")?.addEventListener("click", () => { recordHistory(); state.rotation = state.rotation ? 0 : 1; save(true); renderLayout(); announce("Vista girada."); });
-    $("#v2ZoomIn")?.addEventListener("click", () => { recordHistory(); state.zoom = clamp(Math.round((state.zoom + .1) * 10) / 10, .85, 1.15); save(); renderLayout(); });
-    $("#v2ZoomOut")?.addEventListener("click", () => { recordHistory(); state.zoom = clamp(Math.round((state.zoom - .1) * 10) / 10, .85, 1.15); save(); renderLayout(); });
+    $("#v2ZoomIn")?.addEventListener("click", () => { recordHistory(); state.zoom = clamp(Math.round((state.zoom + .1) * 10) / 10, .85, 1.15); save(); renderLayout(); announce(`Imagem aumentada para ${Math.round(state.zoom * 100)}%.`); });
+    $("#v2ZoomOut")?.addEventListener("click", () => { recordHistory(); state.zoom = clamp(Math.round((state.zoom - .1) * 10) / 10, .85, 1.15); save(); renderLayout(); announce(`Imagem reduzida para ${Math.round(state.zoom * 100)}%.`); });
     $("#v2Activities")?.addEventListener("change", (event) => { if (event.target.matches("input")) { state.activities = $$('input:checked', $("#v2Activities")).map((input) => input.value); save(); updateActivityHint(); renderFeasibility(); renderSummary(); } });
     $("#v2Note")?.addEventListener("input", (event) => { state.note = event.target.value.slice(0, 400); save(); renderFeasibility(); renderSummary(); });
     $("#v2CarePlan")?.addEventListener("change", (event) => { const field = event.target; if (field.name) { state.care[field.name] = field.value; save(); renderFeasibility(); renderSummary(); } });

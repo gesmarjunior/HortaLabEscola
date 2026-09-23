@@ -120,12 +120,14 @@
 .v2-nudge-actions button[data-v2-nudge="ArrowRight"] { grid-area: 2 / 3; }
 .v2-nudge-actions svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
 .v2-nudge-actions button:hover, .v2-nudge-actions button:focus-visible { border-color: var(--v2-green); background: var(--v2-leaf-soft); }
+.v2-nudge-actions button:disabled, .v2-stage-actions .icon-button:disabled { cursor: not-allowed; opacity: .38; background: #f2f4f0; }
 .v2-iso-stage { min-width: 0; overflow: hidden; }
 .v2-stage-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 1rem; border-bottom: 1px solid var(--v2-line); }
 .v2-stage-toolbar strong, .v2-stage-toolbar span { display: block; }
 .v2-stage-toolbar strong { color: var(--v2-green); font-size: .9rem; }
 .v2-stage-toolbar span { margin-top: .15rem; color: var(--v2-muted); font-size: .72rem; }
 .v2-stage-actions { display: flex; gap: .35rem; }
+.v2-zoom-status { min-width: 2.8rem; align-self: center; color: var(--v2-muted); font-size: .72rem; font-weight: 760; text-align: center; }
 .v2-stage-actions .icon-button { flex: 0 0 auto; width: 2.15rem; height: 2.15rem; border: 1px solid var(--v2-line); border-radius: 10px; background: #fff; color: var(--v2-green); font-size: 1.15rem; font-weight: 800; cursor: pointer; }
 .v2-stage-actions .icon-button:hover, .v2-stage-actions .icon-button:focus-visible { border-color: var(--v2-green); background: var(--v2-leaf-soft); }
 .v2-svg-wrap { min-height: 540px; display: grid; place-items: center; overflow: auto; padding: 1rem; background: radial-gradient(circle at 50% 40%, #fff 0 30%, #f2ede2 68%, #e8dfcf 100%); }
@@ -136,7 +138,7 @@
 #v2IsoCanvas .iso-label { paint-order: stroke; stroke: rgba(255,255,255,.96); stroke-width: 4px; stroke-linejoin: round; fill: var(--v2-ink); font-size: 11px; font-weight: 800; pointer-events: none; }
 .iso-object { pointer-events: none; transform-box: fill-box; transform-origin: center bottom; transition: transform .18s ease, filter .18s ease; }
 #v2IsoCanvas .iso-hit:hover .iso-object, #v2IsoCanvas .iso-hit:focus .iso-object { transform: translateY(-2px); filter: saturate(1.06) brightness(1.02); }
-.iso-sprite { image-rendering: auto; }
+.iso-sprite { image-rendering: auto; pointer-events: visiblePainted; cursor: pointer; touch-action: manipulation; }
 .iso-world { isolation: isolate; }
 .v2-stage-legend { display: flex; flex-wrap: wrap; gap: .75rem 1.2rem; padding: .75rem 1rem; border-top: 1px solid var(--v2-line); color: var(--v2-muted); font-size: .72rem; }
 .legend-dot { display: inline-block; width: .55rem; height: .55rem; margin-right: .35rem; border-radius: 50%; vertical-align: middle; }

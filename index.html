@@ -9,7 +9,7 @@
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/planner.css?v=2.4.0">
+  <link rel="stylesheet" href="css/planner.css?v=2.4.1">
   <link rel="stylesheet" href="css/print.css" media="print">
 </head>
 <body class="v2-body">
@@ -123,10 +123,10 @@
             <div class="v2-layout-meter"><div class="v2-meter-label"><span>Uso da área</span><strong id="v2LayoutPercent">0%</strong></div><div class="v2-area-meter"><span id="v2LayoutMeter"></span></div></div>
             <div class="v2-panel-heading v2-panel-heading-spaced"><h3>Itens da horta</h3><span id="v2LayoutCount">0 itens</span></div>
             <ul id="v2LayoutList" class="v2-layout-list"></ul>
-            <div class="v2-selected-actions"><strong id="v2SelectedTitle">Selecione uma zona</strong><span id="v2SelectedHelp">Clique em um item da cena ou da lista.</span><div class="v2-nudge-actions" aria-label="Controle direcional para reposicionar zona"><button type="button" data-v2-nudge="ArrowUp" aria-label="Mover visualmente para cima"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><button type="button" data-v2-nudge="ArrowLeft" aria-label="Mover visualmente para a esquerda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><button type="button" data-v2-nudge="ArrowDown" aria-label="Mover visualmente para baixo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button><button type="button" data-v2-nudge="ArrowRight" aria-label="Mover visualmente para a direita"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div><div><button class="button button-danger button-small" id="v2RemoveSelected" type="button" disabled>Remover</button></div></div>
+            <div class="v2-selected-actions"><strong id="v2SelectedTitle">Selecione uma zona</strong><span id="v2SelectedHelp">Clique em um item da cena ou da lista.</span><div class="v2-nudge-actions" aria-label="Controle direcional para reposicionar zona"><button type="button" data-v2-nudge="ArrowUp" aria-label="Mover visualmente para cima" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg></button><button type="button" data-v2-nudge="ArrowLeft" aria-label="Mover visualmente para a esquerda" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><button type="button" data-v2-nudge="ArrowDown" aria-label="Mover visualmente para baixo" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 10 6 6 6-6"/></svg></button><button type="button" data-v2-nudge="ArrowRight" aria-label="Mover visualmente para a direita" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div><div><button class="button button-danger button-small" id="v2RemoveSelected" type="button" disabled>Remover</button></div></div>
           </aside>
           <div class="v2-iso-stage v2-panel">
-            <div class="v2-stage-toolbar"><div><strong>Vista da horta</strong><span>Escolha um item e use as setas para movê-lo.</span></div><div class="v2-stage-actions"><button type="button" class="icon-button" id="v2Rotate" aria-label="Girar a vista da horta">↻</button><button type="button" class="icon-button" id="v2ZoomOut" aria-label="Diminuir a imagem">−</button><button type="button" class="icon-button" id="v2ZoomIn" aria-label="Aumentar a imagem">+</button></div></div>
+            <div class="v2-stage-toolbar"><div><strong>Vista da horta</strong><span>Escolha um item e use as setas para movê-lo.</span></div><div class="v2-stage-actions"><output id="v2ZoomStatus" class="v2-zoom-status" aria-label="Tamanho da imagem">100%</output><button type="button" class="icon-button" id="v2Rotate" aria-label="Girar a vista da horta">↻</button><button type="button" class="icon-button" id="v2ZoomOut" aria-label="Diminuir a imagem">−</button><button type="button" class="icon-button" id="v2ZoomIn" aria-label="Aumentar a imagem">+</button></div></div>
             <div class="v2-svg-wrap"><svg id="v2IsoCanvas" viewBox="100 95 560 350" role="img" aria-labelledby="v2IsoTitle v2IsoDesc"><title id="v2IsoTitle">Maquete 3D da horta</title><desc id="v2IsoDesc">Imagem em 3D dos itens escolhidos para a horta.</desc></svg></div>
             <div class="v2-stage-legend"><span><i class="legend-dot legend-bed"></i>Produção</span><span><i class="legend-dot legend-path"></i>Circulação</span><span><i class="legend-dot legend-support"></i>Apoio</span><span><i class="legend-dot legend-learning"></i>Aprendizagem</span></div>
           </div>
@@ -182,6 +182,6 @@
   <script src="js/data.js" defer></script>
   <script src="js/rules.js" defer></script>
   <script src="js/local-db.js" defer></script>
-  <script src="js/planner.js?v=2.4.0" defer></script>
+  <script src="js/planner.js?v=2.4.1" defer></script>
 </body>
 </html>
