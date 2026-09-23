@@ -8,16 +8,16 @@
   const scenarioFor = (state) => HL.SCENARIOS.find((item) => item.id === state.scenarioId) || HL.SCENARIOS[0];
 
   const RULE_DESCRIPTIONS = [
-    ["Ambiental", "Água regular", "+12", "Água limitada, sazonal ou não confirmada reduz o indicador."],
-    ["Ambiental", "Solo ou substrato conhecido", "+6 a +8", "Condição degradada ou desconhecida exige confirmação."],
-    ["Ambiental", "Compostagem com equipe", "+7", "Sem responsáveis suficientes, a compostagem gera risco em vez de bônus."],
-    ["Social", "Circulação e manobra", "+12", "Quando há necessidade de acessibilidade, ao menos 20% da área deve apoiar deslocamento; o valor ainda precisa ser validado no local."],
-    ["Social", "Participação e espaço educativo", "+4 a +6", "Área pedagógica, observação e finalidade comunitária ampliam participação."],
-    ["Governança", "Responsáveis definidos", "-12 a +12", "O efeito varia de nenhuma pessoa a três ou mais responsáveis."],
-    ["Governança", "Plano para férias", "-10 a +12", "Cobertura parcial ajuda pouco; responsáveis e substitutos definidos fortalecem continuidade."],
-    ["Pedagógica", "Atividades selecionadas", "+4 a +18", "O ganho cresce com atividades variadas e registradas."],
-    ["Pedagógica", "Intenção pedagógica registrada", "+8", "Um registro com pelo menos 40 caracteres ajuda a explicitar propósito e evidência."],
-    ["Todas", "Decisões diante de eventos", "-18 a +12", "Cada opção possui impacto fixo e visível; não há sorteio."]
+    ["Meio ambiente", "Água regular", "+12", "Água limitada, sazonal ou não confirmada reduz o resultado."],
+    ["Meio ambiente", "Solo ou substrato conhecido", "+6 a +8", "Condição degradada ou desconhecida precisa ser verificada."],
+    ["Meio ambiente", "Compostagem com equipe", "+7", "Sem pessoas responsáveis, a compostagem aumenta o risco de abandono."],
+    ["Participação e acesso", "Caminhos e espaço de manobra", "+12", "Quando há necessidade de adaptação, ao menos 20% da área deve apoiar o deslocamento. As medidas precisam ser conferidas no local."],
+    ["Participação e acesso", "Espaço para aprender e observar", "+4 a +6", "Áreas de atividade e observação favorecem a participação."],
+    ["Organização", "Pessoas responsáveis", "-12 a +12", "O resultado varia conforme o número de pessoas que realmente podem dividir os cuidados."],
+    ["Organização", "Cuidados nas férias", "-10 a +12", "Responsáveis e substitutos combinados fortalecem a continuidade."],
+    ["Uso nas aulas", "Atividades escolhidas", "+4 a +18", "O resultado melhora quando há mais de uma atividade e formas de registro."],
+    ["Uso nas aulas", "Intenção pedagógica escrita", "+8", "Uma descrição curta ajuda a deixar claro o que será investigado."],
+    ["Todos os pontos", "Escolhas diante de imprevistos", "-18 a +12", "Cada opção tem um efeito fixo e explicado. Não há sorteio."]
   ];
 
   function choiceImpact(state, dimension) {
@@ -31,13 +31,14 @@
   }
 
   function statusFor(score) {
-    if (score >= 70) return { statusLabel: "Base consistente", tone: "positive" };
-    if (score >= 45) return { statusLabel: "Em construção", tone: "moderate" };
-    return { statusLabel: "Atenção prioritária", tone: "attention" };
+    if (score >= 70) return { statusLabel: "Bem encaminhado", tone: "positive" };
+    if (score >= 45) return { statusLabel: "Precisa de alguns ajustes", tone: "moderate" };
+    return { statusLabel: "Precisa de atenção", tone: "attention" };
   }
 
   function evaluatePlan(state) {
-    const d = state.diagnosis || {};
+    const d = state.diagnosis || state.essentials || {};
+    const care = state.care || {};
     const scenario = scenarioFor(state);
     const total = areaTotal(state.components);
     const paths = areaByType(state.components, "paths") + areaByType(state.components, "maneuver");
@@ -51,10 +52,10 @@
     const eventCount = Object.keys(state.eventDecisions || {}).length;
 
     const dimensions = {
-      environmental: { key: "environmental", label: "Ambiental", score: 35, color: "#4D8B43", contributions: [], risks: [], improvements: [], confirmations: [] },
-      social: { key: "social", label: "Social", score: 35, color: "#327FAF", contributions: [], risks: [], improvements: [], confirmations: [] },
-      governance: { key: "governance", label: "Governança", score: 35, color: "#C76A36", contributions: [], risks: [], improvements: [], confirmations: [] },
-      pedagogical: { key: "pedagogical", label: "Pedagógica", score: 35, color: "#8A669F", contributions: [], risks: [], improvements: [], confirmations: [] }
+      environmental: { key: "environmental", label: "Meio ambiente", score: 35, color: "#4D8B43", contributions: [], risks: [], improvements: [], confirmations: [] },
+      social: { key: "social", label: "Participação e acesso", score: 35, color: "#327FAF", contributions: [], risks: [], improvements: [], confirmations: [] },
+      governance: { key: "governance", label: "Organização", score: 35, color: "#C76A36", contributions: [], risks: [], improvements: [], confirmations: [] },
+      pedagogical: { key: "pedagogical", label: "Uso nas aulas", score: 35, color: "#8A669F", contributions: [], risks: [], improvements: [], confirmations: [] }
     };
     const e = dimensions.environmental;
     const s = dimensions.social;
@@ -69,14 +70,14 @@
     if (d.sunlight === "high") { e.score += 10; e.contributions.push("Insolação informada acima de seis horas."); }
     else if (d.sunlight === "medium") { e.score += 7; e.contributions.push("Insolação entre quatro e seis horas foi considerada."); }
     else if (d.sunlight === "low") { e.score -= 6; e.risks.push("Menos de quatro horas de sol limita escolhas de cultivo."); }
-    else { e.score -= 5; e.risks.push("A insolação não foi observada em horários diferentes."); }
+    else { e.score -= 5; e.risks.push("As horas de sol não foram observadas em horários diferentes."); }
 
     if (d.soil === "known") { e.score += 8; e.contributions.push("Condições gerais do solo foram observadas."); }
     else if (d.soil === "containers") { e.score += 6; e.contributions.push("O plano prevê substrato em recipientes, reduzindo dependência do solo local."); }
     else if (d.soil === "poor") { e.score -= 6; e.risks.push("Solo compactado, encharcado ou degradado exige solução técnica."); e.improvements.push("Avaliar drenagem, recuperação ou uso de recipientes/canteiros elevados."); }
     else { e.score -= 5; e.risks.push("Solo ou substrato ainda não foi avaliado."); }
 
-    if (waterArea > 0) { e.score += 4; e.contributions.push("A composição reserva espaço para água."); }
+    if (waterArea > 0) { e.score += 4; e.contributions.push("O plano reserva espaço para água."); }
     if (compost > 0 && responsibleCount >= 2) { e.score += 7; e.contributions.push("Compostagem foi incluída com equipe mínima indicada."); }
     else if (compost > 0) { e.score -= 5; e.risks.push("Compostagem sem equipe suficiente pode gerar odores, vetores ou abandono."); e.improvements.push("Definir responsável e controle de vetores, ou retirar a compostagem nesta fase."); }
 
@@ -85,7 +86,7 @@
       s.score += 12; s.contributions.push("O mapa reserva ao menos 20% para caminhos e manobra diante da necessidade de acesso.");
     } else if (d.accessibility === "required" && circulationRatio < .2) {
       s.score -= 10; s.risks.push("A circulação planejada pode ser insuficiente para a necessidade de acessibilidade indicada."); s.improvements.push("Ampliar caminhos e manobra e validar medidas com usuários e profissionais.");
-    } else if (circulationRatio >= .2) { s.score += 6; s.contributions.push("A composição preserva circulação e manobra."); }
+    } else if (circulationRatio >= .2) { s.score += 6; s.contributions.push("O mapa preserva circulação e manobra."); }
     if (pedagogyArea > 0) { s.score += 6; s.contributions.push("Há espaço destinado a atividades pedagógicas."); }
     if (observationArea > 0) { s.score += 4; s.contributions.push("Há área de observação no plano."); }
     if (d.purpose === "community") { s.score += 4; s.contributions.push("A finalidade inclui mobilização comunitária."); }
@@ -100,22 +101,32 @@
     if (d.vacation === "covered") { g.score += 12; g.contributions.push("Férias contam com responsáveis e substitutos definidos."); }
     else if (d.vacation === "partial") { g.score += 2; g.risks.push("A cobertura de férias é apenas parcial."); g.improvements.push("Definir substitutos, frequência e critérios de pausa."); }
     else { g.score -= 10; g.risks.push("Não há plano de continuidade para férias e recessos."); g.improvements.push("Criar escala ou reduzir cultivos antes dos recessos."); }
-    if (d.budget && d.budget !== "none") { g.score += 5; g.contributions.push("Uma faixa de orçamento foi considerada."); }
-    else { g.score -= 3; g.risks.push("O orçamento ainda não foi definido."); }
+    if (d.budget === "defined") { g.score += 5; g.contributions.push("Há um valor reservado para o projeto."); }
+    else if (d.budget === "limited") { g.score += 2; g.contributions.push("A limitação de recursos foi considerada no planejamento."); }
+    else { g.score -= 3; g.risks.push("O orçamento ainda não foi definido."); g.improvements.push("Estimar os gastos essenciais antes de comprar materiais."); }
     if (d.tools === "enough") { g.score += 6; g.contributions.push("Conjunto básico de ferramentas foi informado."); }
     else if (d.tools === "partial") { g.score += 2; g.improvements.push("Completar e organizar o conjunto de ferramentas essenciais."); }
     else { g.score -= 4; g.risks.push("Ferramentas e armazenamento seguro ainda não estão disponíveis."); }
-    if (total <= scenario.area + .01) { g.score += 4; g.contributions.push("A composição respeita o limite de área do cenário."); }
-    if (state.components.length > 10 && responsibleCount < 3) { g.score -= 8; g.risks.push("Há muitos componentes para uma equipe pequena."); g.improvements.push("Simplificar o arranjo ou ampliar a equipe antes de expandir."); }
+    if (total <= scenario.area + .01) { g.score += 4; g.contributions.push("Os espaços respeitam o tamanho escolhido."); }
+    if (state.components.length > 10 && responsibleCount < 3) { g.score -= 8; g.risks.push("Há muitos itens para uma equipe pequena."); g.improvements.push("Simplificar a horta ou ampliar a equipe antes de expandir."); }
+    if (["daily", "fewTimes"].includes(care.routine)) { g.score += 7; g.contributions.push("A frequência de cuidado foi combinada."); }
+    else if (care.routine === "weekly") { g.score += 3; g.contributions.push("Há uma frequência semanal de cuidado."); }
+    else { g.score -= 5; g.risks.push("A frequência de cuidado ainda não foi combinada."); g.improvements.push("Definir quando a equipe observará, regará e registrará a horta."); }
+    if (care.backup === "defined") { g.score += 6; g.contributions.push("Há substituto combinado para ausências."); }
+    else if (care.backup === "none") { g.score -= 4; g.risks.push("A continuidade depende da presença da pessoa principal."); }
+    if (care.costTracking === "yes") { g.score += 4; g.contributions.push("O registro de gastos e materiais está previsto."); }
+    else if (care.costTracking === "no") { g.score -= 2; g.improvements.push("Combinar uma forma simples de registrar gastos e materiais."); }
+    if (care.pauseCriteria === "yes") { g.score += 5; g.contributions.push("A equipe já definiu quando reduzir ou pausar o projeto."); }
+    else if (care.pauseCriteria === "no") { g.score -= 4; g.improvements.push("Definir quando a escola deve reduzir ou pausar a horta com segurança."); }
 
-    if (activityCount >= 5) { p.score += 18; p.contributions.push(`${activityCount} atividades pedagógicas foram selecionadas.`); }
-    else if (activityCount >= 3) { p.score += 12; p.contributions.push(`${activityCount} atividades pedagógicas foram selecionadas.`); }
-    else if (activityCount >= 1) { p.score += 4; p.contributions.push(`${activityCount} atividade(s) pedagógica(s) foi/foram selecionada(s).`); p.improvements.push("Ampliar a articulação curricular e os registros previstos."); }
+    if (activityCount >= 5) { p.score += 18; p.contributions.push(`${activityCount} atividades para as aulas foram escolhidas.`); }
+    else if (activityCount >= 3) { p.score += 12; p.contributions.push(`${activityCount} atividades para as aulas foram escolhidas.`); }
+    else if (activityCount >= 1) { p.score += 4; p.contributions.push(activityCount === 1 ? "Uma atividade para as aulas foi escolhida." : `${activityCount} atividades para as aulas foram escolhidas.`); p.improvements.push("Relacionar a horta a outras aulas e combinar formas simples de registro."); }
     else { p.score -= 10; p.risks.push("Nenhuma atividade pedagógica foi selecionada."); p.improvements.push("Relacionar ao menos duas atividades com perguntas e registros."); }
-    if ((state.pedagogyNote || "").trim().length >= 40) { p.score += 8; p.contributions.push("A intenção pedagógica foi registrada de forma descritiva."); }
+    if ((state.pedagogyNote || state.note || "").trim().length >= 20) { p.score += 8; p.contributions.push("A intenção pedagógica foi registrada de forma descritiva."); }
     else { p.score -= 3; p.improvements.push("Registrar o que será investigado, por quanto tempo e com qual evidência."); }
-    if (pedagogyArea > 0) { p.score += 5; p.contributions.push("A composição inclui área pedagógica."); }
-    if (observationArea > 0) { p.score += 5; p.contributions.push("A composição inclui área de observação."); }
+    if (pedagogyArea > 0) { p.score += 5; p.contributions.push("O plano inclui espaço para atividades pedagógicas."); }
+    if (observationArea > 0) { p.score += 5; p.contributions.push("O plano inclui espaço de observação."); }
     if (curricularCount >= 2) { p.score += 6; p.contributions.push("O diagnóstico relaciona dois ou mais componentes curriculares."); }
 
     Object.values(dimensions).forEach((dimension) => {
@@ -125,7 +136,7 @@
       Object.assign(dimension, statusFor(dimension.score));
     });
 
-    e.confirmations.push("Insolação ao longo do dia e do ano.", "Qualidade do solo ou substrato, drenagem e espécies adequadas ao clima.", "Disponibilidade e segurança da fonte de água.");
+    e.confirmations.push("Quantidade de horas de sol ao longo do dia e do ano.", "Qualidade do solo ou substrato, drenagem e plantas adequadas ao clima.", "Disponibilidade e segurança da fonte de água.");
     s.confirmations.push("Percurso, largura, piso, alcance e participação com as pessoas que usarão o espaço.", "Regras locais de segurança e supervisão.");
     g.confirmations.push("Nomes e disponibilidade dos responsáveis principais e substitutos.", "Custos, autorizações, manutenção e critérios de pausa.");
     p.confirmations.push("Alinhamento com currículo, calendário escolar e formas de registro.", "Tempo docente disponível e participação das turmas.");

@@ -4,20 +4,21 @@ Produto educacional estático para apoiar professores e gestores no planejamento
 
 ## Versão oficial e histórico
 
-O produto possui uma única entrada oficial em `index.html`. Na versão `2.3.0`, a jornada simplificada mantém a composição 2D antes da aba `Layout`: o usuário escolhe os componentes no catálogo, organiza o mapa e então configura o mesmo conjunto na montagem isométrica, com seleção, remoção, rotação, zoom e reposicionamento acessível por teclado. A cena usa onze peças 3D originais em PNG transparente — incluindo reservatório com torneira e mangueira, viveiro de mudas, composteira, banco de observação e armário de ferramentas — armazenadas no próprio projeto e disponíveis offline. O controle direcional acompanha a direção visual da tela, inclusive após girar a vista.
+O produto possui uma única entrada oficial em `index.html`. Na versão `2.4.0`, a linguagem foi revisada para professores da educação básica e a jornada passou a acompanhar as tarefas previstas no projeto acadêmico: conhecer a realidade da escola, comparar tamanhos, escolher os espaços, organizar a maquete 3D, planejar aulas e cuidados, testar imprevistos e preparar o plano final. Termos técnicos de informática foram retirados da interface principal, sem eliminar o salvamento local, as exportações ou as regras determinísticas. A cena continua usando onze peças 3D originais em PNG transparente e o controle direcional acompanha a direção visual da tela, inclusive após girar a vista.
 
-A versão anterior não foi apagada do histórico: a tag Git `v1-atual` aponta para o estado anterior do projeto. Assim, o GitHub mantém versionamento real sem criar duas aplicações concorrentes no site publicado.
+A versão anterior continua disponível na tag Git `v2.3.0`; versões ainda mais antigas permanecem no histórico do repositório. Assim, o GitHub mantém uma única aplicação publicada e permite voltar a qualquer versão marcada.
 
 ## Funcionalidades
 
-- jornada guiada em seis etapas;
-- diagnóstico sem dados pessoais;
+- jornada guiada em sete etapas, com linguagem voltada a professores;
+- diagnóstico sem dados pessoais sobre espaço, sol, água, solo, acesso, equipe, férias, orçamento e ferramentas;
 - cenários comparativos de 12, 25 e 50 m²;
 - simulador de composição 2D com catálogo, mapa proporcional, lista, grade, inspetor, desfazer/refazer, arrastar e soltar e comandos equivalentes por botão/teclado;
 - total de área validado em tempo real;
 - layout isométrico de alta qualidade gráfica com zonas selecionáveis;
-- planejamento curricular e atividades selecionáveis;
-- resumo imprimível do plano;
+- planejamento curricular, rotina de cuidados, substitutos, gastos e critérios de pausa;
+- imprevistos com escolhas explicadas e revisão do plano em quatro dimensões;
+- plano final imprimível com condições, espaços, atividades, cuidados, decisões, alertas e próximos ajustes;
 - exportação e importação JSON validadas;
 - salvamento local em banco SQLite no navegador, persistido no IndexedDB do próprio dispositivo;
 - exportação e importação de backup `.sqlite`;
@@ -51,18 +52,20 @@ Os testes verificam:
 - determinismo e limites dos indicadores;
 - impacto previsível dos eventos;
 - rejeição de JSON com área impossível;
-- presença das seis etapas e controles essenciais;
+- presença das sete etapas e controles essenciais;
 - schema e persistência SQLite local;
 - exportação/importação JSON e SQLite;
 - cobertura temática da cartilha;
 - ausência de scripts, fontes e imagens remotas;
 - composição 2D, inspetor, mapa/lista, grade, desfazer/refazer e arrastar e soltar;
 - passagem do conjunto escolhido para o layout isométrico;
+- linguagem simples na interface, sem termos de banco de dados ou formatos de programação como rótulos principais;
+- integração entre diagnóstico, cuidados, imprevistos, indicadores explicados e plano final;
 - jornada no navegador, console, impressão e responsividade em 360, 768, 1024 e 1440 px.
 
 O teste de interface usa `playwright-core` como dependência de desenvolvimento e o Chrome ou Edge já instalado, sem baixar outro navegador. Ele percorre a jornada, valida a persistência após recarregar, gera os arquivos de exportação e salva capturas de QA em `%TEMP%\hortalab-escola-qa`.
 
-As capturas revisadas também ficam versionadas em `screenshots/composition-desktop-v2.png`, `screenshots/composition-mobile-v2.png`, `screenshots/layout-desktop-v2.png` e `screenshots/layout-mobile-v2.png`.
+As capturas revisadas também ficam versionadas em `screenshots/`: início da jornada, escolha dos espaços, maquete 3D e revisão dos imprevistos, em desktop e celular.
 
 ## Estrutura
 

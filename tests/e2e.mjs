@@ -28,9 +28,24 @@ const expectText = async (selector, expected) => { await page.waitForFunction(({
 await page.goto(`${baseURL}/index.html`, { waitUntil: "networkidle" });
 await page.evaluate(() => new Promise((resolve) => { const request = indexedDB.deleteDatabase("hortalab-escola-device"); request.onsuccess = request.onerror = request.onblocked = () => resolve(); }));
 await page.reload({ waitUntil: "networkidle" });
-check((await page.title()).includes("planejamento visual"), "A entrada oficial não carregou.");
+check((await page.title()).includes("planeje a horta da escola"), "A entrada oficial não carregou.");
 check(await page.locator("#v2Essentials").isVisible(), "A etapa essencial não está visível.");
-await expectText("#v2StorageStatus", "SQLite local · salvo");
+await expectText("#v2StorageStatus", "Plano salvo aqui");
+check(await page.locator('[data-v2-step="7"]').isDisabled(), "Uma etapa futura deveria permanecer bloqueada até ser alcançada.");
+const visibleEntryText = await page.locator("body").innerText();
+for (const term of ["SQLite", "JSON", "layout isométrico", "painel ESG", "banco de dados"]) check(!visibleEntryText.toLowerCase().includes(term.toLowerCase()), `Termo técnico exposto na entrada: ${term}.`);
+await page.locator("#v2-step-1-title").scrollIntoViewIfNeeded();
+await page.screenshot({ path: join(qaDir, "journey-start-desktop.png"), fullPage: false });
+await page.locator(".skip-link").focus();
+const firstKeyboardFocus = await page.evaluate(() => {
+  const active = document.activeElement;
+  const style = getComputedStyle(active);
+  const firstFocusable = document.querySelector('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+  return { className: active?.className || "", firstClassName: firstFocusable?.className || "", outlineStyle: style.outlineStyle, outlineWidth: style.outlineWidth };
+});
+check(String(firstKeyboardFocus.className).includes("skip-link"), "O primeiro foco do teclado não chegou ao link de pular conteúdo.");
+check(String(firstKeyboardFocus.firstClassName).includes("skip-link"), "O link de pular conteúdo não é o primeiro controle da página.");
+check(firstKeyboardFocus.outlineStyle !== "none" && firstKeyboardFocus.outlineWidth !== "0px", "O foco do teclado não está visível.");
 
 await page.locator("[data-v2-next]").first().click();
 await page.locator('[data-v2-scenario="expanded"]').click();
@@ -100,10 +115,28 @@ check(rotatedReturned.x > rotatedLeft.x + 20 && Math.abs(rotatedReturned.y - rot
 
 await page.locator('[data-v2-panel="4"] [data-v2-next]').click();
 await page.locator("#v2Activities input").first().check();
+await page.locator("#v2Activities input").nth(1).check();
+await expectText("#v2ActivityHint", "2 atividades escolhidas");
 await page.locator("#v2Note").fill("Acompanhar germinação e registrar medidas.");
+await page.locator('#v2CarePlan select[name="routine"]').selectOption("fewTimes");
+await page.locator('#v2CarePlan select[name="backup"]').selectOption("defined");
+await page.locator('#v2CarePlan select[name="costTracking"]').selectOption("yes");
+await page.locator('#v2CarePlan select[name="pauseCriteria"]').selectOption("yes");
 await page.locator('[data-v2-panel="5"] [data-v2-next]').click();
+check(await page.locator('[data-v2-panel="6"]').isVisible(), "A revisão de imprevistos não foi aberta.");
+check(await page.locator("#v2Feasibility .v2-indicator").count() === 4, "Os quatro pontos de revisão do plano não foram mostrados.");
+await page.locator('#v2EventCard input[value="rotation"]').check();
+await expectText("#v2EventCard", "O que essa escolha muda");
+await page.locator("#v2EventPicker").selectOption("waterRestriction");
+await page.locator('#v2EventCard input[value="adapt"]').check();
+await expectText("#v2EventCard", "quantidade realmente disponível");
+await page.locator('[data-v2-panel="6"] [data-v2-next]').click();
 check(await page.locator("#v2Summary").isVisible(), "O resumo não foi gerado.");
 check((await text("#v2Summary")).includes("50 m²"), "O resumo não preservou o cenário.");
+check((await text("#v2Summary")).includes("Férias escolares"), "O plano final não registrou o imprevisto de férias.");
+check((await text("#v2Summary")).includes("Restrição de água"), "O plano final não registrou o imprevisto de água.");
+check((await text("#v2Summary")).includes("Ordem sugerida"), "O plano final não apresentou uma sequência de acompanhamento.");
+check((await text("#v2Summary")).includes("Orçamento:"), "O plano final não registrou os recursos informados.");
 
 const jsonDownloadPromise = page.waitForEvent("download");
 await page.locator("#v2Export").click();
@@ -124,18 +157,18 @@ check(sqliteBytes.byteLength > 1000, "O backup SQLite parece incompleto.");
 check(sqliteBytes.subarray(0, 15).toString("ascii") === "SQLite format 3", "O arquivo exportado não tem cabeçalho SQLite.");
 
 await page.reload({ waitUntil: "networkidle" });
-check(await page.locator('[data-v2-panel="6"]').isVisible(), "A etapa atual não foi restaurada pelo SQLite.");
+check(await page.locator('[data-v2-panel="7"]').isVisible(), "A etapa atual não foi restaurada pelo armazenamento local.");
 await page.locator("#v2ResetBottom").click();
-await expectText("#v2StorageStatus", "SQLite local · salvo");
+await expectText("#v2StorageStatus", "Plano salvo aqui");
 check(await page.locator('[data-v2-panel="1"]').isVisible(), "O reinício não voltou ao início.");
 await page.setInputFiles("#v2ImportFile", jsonPath);
-await expectText("#v2Live", "Plano importado");
-check(await page.locator('[data-v2-panel="6"]').isVisible(), "A importação JSON não restaurou o resumo.");
+await expectText("#v2Live", "A cópia foi aberta");
+check(await page.locator('[data-v2-panel="7"]').isVisible(), "A primeira cópia não restaurou o plano final.");
 await page.locator("#v2ResetBottom").click();
-await expectText("#v2StorageStatus", "SQLite local · salvo");
+await expectText("#v2StorageStatus", "Plano salvo aqui");
 await page.setInputFiles("#v2ImportFile", sqlitePath);
-await expectText("#v2Live", "Plano importado");
-check(await page.locator('[data-v2-panel="6"]').isVisible(), "A importação SQLite não restaurou o resumo.");
+await expectText("#v2Live", "A cópia foi aberta");
+check(await page.locator('[data-v2-panel="7"]').isVisible(), "A cópia completa não restaurou o plano final.");
 check((await text("#v2Summary")).includes("50 m²"), "A importação SQLite perdeu o cenário.");
 
 await page.emulateMedia({ media: "print" });
@@ -153,7 +186,14 @@ for (const width of [360, 768, 1024, 1440]) {
 await page.setViewportSize({ width: 1440, height: 900 });
 await page.locator("#v2IsoCanvas").scrollIntoViewIfNeeded();
 await page.screenshot({ path: join(qaDir, "layout-desktop.png"), fullPage: false });
+await page.locator('[data-v2-step="6"]').click();
+await page.locator("#v2-step-6-title").scrollIntoViewIfNeeded();
+await page.screenshot({ path: join(qaDir, "review-desktop.png"), fullPage: false });
 await page.setViewportSize({ width: 360, height: 800 });
+await page.locator('[data-v2-step="6"]').click();
+await page.locator("#v2-step-6-title").scrollIntoViewIfNeeded();
+await page.screenshot({ path: join(qaDir, "review-mobile.png"), fullPage: false });
+await page.locator('[data-v2-step="4"]').click();
 await page.locator("#v2IsoCanvas").scrollIntoViewIfNeeded();
 await page.screenshot({ path: join(qaDir, "layout-mobile.png"), fullPage: false });
 await page.locator('[data-v2-step="3"]').click();
@@ -163,5 +203,5 @@ await page.screenshot({ path: join(qaDir, "composition-mobile.png"), fullPage: f
 check(errors.length === 0, `Erros de console: ${errors.join(" | ")}`);
 check(warnings.length === 0, `Avisos de console: ${warnings.join(" | ")}`);
 check(externalRequests.length === 0, `Requisições externas detectadas: ${externalRequests.join(" | ")}`);
-console.log(JSON.stringify({ ok: true, page: "index.html", sqlite: true, jsonExport: true, jsonImport: true, viewports: [360, 768, 1024, 1440], consoleErrors: errors.length, consoleWarnings: warnings.length, externalRequests: externalRequests.length, screenshots: [join(qaDir, "composition-desktop.png"), join(qaDir, "composition-mobile.png"), join(qaDir, "layout-desktop.png"), join(qaDir, "layout-mobile.png")] }, null, 2));
+console.log(JSON.stringify({ ok: true, page: "index.html", localDatabase: true, planCopies: true, guidedSteps: 7, activitiesRequired: 2, eventDecisions: 2, explainedDimensions: 4, keyboardFocus: true, viewports: [360, 768, 1024, 1440], consoleErrors: errors.length, consoleWarnings: warnings.length, externalRequests: externalRequests.length, screenshots: [join(qaDir, "journey-start-desktop.png"), join(qaDir, "composition-desktop.png"), join(qaDir, "composition-mobile.png"), join(qaDir, "layout-desktop.png"), join(qaDir, "layout-mobile.png"), join(qaDir, "review-desktop.png"), join(qaDir, "review-mobile.png")] }, null, 2));
 await browser.close();

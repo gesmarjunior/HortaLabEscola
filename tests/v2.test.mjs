@@ -6,8 +6,10 @@ import vm from "node:vm";
 async function loadData() {
   const context = vm.createContext({ window: {}, console });
   context.window.window = context.window;
-  const source = await readFile(new URL("../js/data.js", import.meta.url), "utf8");
-  vm.runInContext(source, context, { filename: "js/data.js" });
+  for (const file of ["data.js", "rules.js"]) {
+    const source = await readFile(new URL(`../js/${file}`, import.meta.url), "utf8");
+    vm.runInContext(source, context, { filename: `js/${file}` });
+  }
   return context.window.HortaLab;
 }
 
@@ -66,4 +68,41 @@ test("cada componente possui um PNG 3D transparente e otimizado", async () => {
     assert.equal(png[25], 6, `${type}: PNG deve preservar canal alfa RGBA`);
     assert.ok(png.byteLength < 250000, `${type}: arquivo maior que 250 KB`);
   }
+});
+
+test("os quatro pontos do plano usam regras fixas e explicadas", async () => {
+  const data = await loadData();
+  const scenario = data.SCENARIOS.find((item) => item.id === "compact");
+  const base = {
+    scenarioId: scenario.id,
+    components: scenario.seed.map(([type, area], index) => ({ id: `item-${index}`, type, area })),
+    essentials: { water: "regular", sunlight: "medium", soil: "known", accessibility: "desirable", responsibles: 2, vacation: "partial", budget: "limited", tools: "partial" },
+    activities: ["germination", "measure"],
+    note: "Registrar o crescimento das plantas durante seis semanas.",
+    care: { routine: "fewTimes", backup: "defined", costTracking: "yes", pauseCriteria: "yes" },
+    eventDecisions: { vacation: "rotation" }
+  };
+  const first = data.evaluatePlan(base);
+  const second = data.evaluatePlan(structuredClone(base));
+  assert.deepEqual(JSON.parse(JSON.stringify(first)), JSON.parse(JSON.stringify(second)), "a avaliação deve ser determinística");
+  assert.deepEqual(Object.keys(first.dimensions), ["environmental", "social", "governance", "pedagogical"]);
+  for (const dimension of Object.values(first.dimensions)) {
+    assert.ok(Number.isInteger(dimension.score) && dimension.score >= 0 && dimension.score <= 100);
+    assert.ok(dimension.statusLabel);
+    assert.ok(dimension.confirmations.length > 0);
+  }
+});
+
+test("combinar cuidados e responder a imprevistos melhora a organização", async () => {
+  const data = await loadData();
+  const scenario = data.SCENARIOS.find((item) => item.id === "compact");
+  const common = {
+    scenarioId: scenario.id,
+    components: scenario.seed.map(([type, area], index) => ({ id: `item-${index}`, type, area })),
+    essentials: { water: "regular", sunlight: "medium", soil: "known", accessibility: "none", responsibles: 2, vacation: "partial", budget: "limited", tools: "partial" },
+    activities: ["germination", "measure"], note: "Acompanhar e registrar mudanças no cultivo.", eventDecisions: {}
+  };
+  const pending = data.evaluatePlan({ ...common, care: { routine: "undefined", backup: "none", costTracking: "no", pauseCriteria: "no" } });
+  const planned = data.evaluatePlan({ ...common, care: { routine: "fewTimes", backup: "defined", costTracking: "yes", pauseCriteria: "yes" }, eventDecisions: { vacation: "rotation" } });
+  assert.ok(planned.dimensions.governance.score > pending.dimensions.governance.score);
 });

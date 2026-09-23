@@ -11,7 +11,7 @@
       color: "#4D8B43",
       soft: "#DDEBD5",
       icon: icon('<path d="M4 8h16v10H4zM7 8V5m10 3V5M8 13h8m-5-3v6"/>'),
-      resource: "estrutura de canteiro, substrato e cobertura do solo"
+      resource: "canteiro, terra adequada e proteção do solo"
     },
     container: {
       label: "Recipiente de cultivo",
@@ -20,7 +20,7 @@
       color: "#9A603A",
       soft: "#F1E1D5",
       icon: icon('<path d="M5 7h14l-2 12H7L5 7Zm-1-3h16v3H4z"/>'),
-      resource: "recipiente drenado e substrato adequado"
+      resource: "recipiente com saída de água e terra adequada"
     },
     paths: {
       label: "Caminhos",
@@ -110,8 +110,8 @@
       id: "micro",
       area: 12,
       name: "Micro-horta",
-      summary: "Início experimental com foco demonstrativo e rotina simples.",
-      bestFor: "Equipe pequena, espaço restrito ou água limitada.",
+      summary: "Opção pequena para começar com uma rotina simples.",
+      bestFor: "Pode atender uma equipe pequena, pouco espaço ou água limitada.",
       notes: ["Recipientes ou 1 a 2 canteiros", "Circulação essencial", "Atividades em pequenos grupos"],
       seed: [
         ["bed", 2], ["bed", 2], ["paths", 2.5], ["maneuver", 1.5],
@@ -122,8 +122,8 @@
       id: "compact",
       area: 25,
       name: "Horta compacta",
-      summary: "Escala intermediária para um projeto interdisciplinar delimitado.",
-      bestFor: "Uma turma ou equipe com responsabilidades compartilhadas.",
+      summary: "Opção intermediária para trabalhar com uma turma ou um projeto definido.",
+      bestFor: "Pode atender uma turma e uma equipe que divide os cuidados.",
       notes: ["2 a 3 canteiros", "Ponto de água e apoio", "Espaço pedagógico preservado"],
       seed: [
         ["bed", 3], ["bed", 3], ["bed", 3], ["paths", 5], ["maneuver", 3],
@@ -134,8 +134,8 @@
       id: "expanded",
       area: 50,
       name: "Horta de aprendizagem ampliada",
-      summary: "Referência comparativa que exige água, equipe e continuidade consistentes.",
-      bestFor: "Somente quando as condições de cuidado justificarem a escala.",
+      summary: "Maior opção do simulador. Exige água, equipe e cuidado contínuo.",
+      bestFor: "Só deve ser escolhida quando a escola consegue manter esse tamanho.",
       notes: ["19,8 m² de canteiros", "17,2 m² de caminhos e manobra", "13 m² de apoio e pedagogia"],
       seed: [
         ["bed", 6.6], ["bed", 6.6], ["bed", 6.6], ["paths", 11.2], ["maneuver", 6],
@@ -151,17 +151,17 @@
     language: "Língua Portuguesa",
     arts: "Artes",
     environmental: "Educação ambiental",
-    governance: "Governança"
+    governance: "Organização"
   };
 
   const ACTIVITIES = [
     { id: "science", name: "Ciências", description: "Germinação, solo, água e biodiversidade", options: [
-      ["germination", "Diário de germinação", "Comparar tempo, umidade e emergência de plântulas."],
+      ["germination", "Diário de germinação", "Comparar tempo, umidade e nascimento das plantas."],
       ["soil", "Investigação do solo", "Observar textura, infiltração e cobertura sem substituir análise técnica."],
       ["biodiversity", "Inventário de biodiversidade", "Registrar organismos observados e relações no ambiente."]
     ]},
     { id: "math", name: "Matemática", description: "Medidas, áreas, proporções e registros", options: [
-      ["measure", "Medir e representar", "Produzir croqui em escala e comparar área produtiva e circulação."],
+      ["measure", "Medir e representar", "Fazer um desenho em escala e comparar cultivo e circulação."],
       ["proportion", "Proporções do espaço", "Calcular percentuais ocupados por cada função."],
       ["records", "Série de registros", "Organizar tabelas simples de observações ao longo do tempo."]
     ]},
@@ -181,10 +181,10 @@
       ["waste", "Mapa de resíduos", "Identificar fluxos, possibilidades e limites de compostagem."],
       ["watercare", "Plano de cuidado da água", "Discutir uso eficiente, perdas e responsabilidades."]
     ]},
-    { id: "governance", name: "Governança", description: "Responsabilidades, orçamento e transparência", options: [
-      ["roles", "Matriz de responsabilidades", "Distinguir responsáveis principais, substitutos e apoios."],
-      ["budget", "Orçamento transparente", "Registrar prioridades, custos estimados e critérios de compra."],
-      ["continuity", "Protocolo de continuidade", "Definir rotina, férias, pausa e retomada segura."]
+    { id: "governance", name: "Organização da equipe", description: "Responsáveis, orçamento e continuidade", options: [
+      ["roles", "Quadro de responsabilidades", "Distinguir responsáveis principais, substitutos e pessoas de apoio."],
+      ["budget", "Registro do orçamento", "Anotar prioridades, gastos estimados e escolhas de compra."],
+      ["continuity", "Plano de continuidade", "Definir rotina, férias, pausa e retomada segura."]
     ]}
   ];
 
@@ -192,65 +192,65 @@
     {
       id: "vacation", title: "Férias escolares", problem: "A rotina de cuidado ficará interrompida por várias semanas.",
       options: [
-        { id: "rotation", label: "Definir escala com responsáveis e substitutos", feedback: "A escala distribui o cuidado e deixa a continuidade verificável.", impact: { governance: 10, social: 3 } },
+        { id: "rotation", label: "Combinar dias de cuidado com responsáveis e substitutos", feedback: "Dividir os dias de cuidado reduz a dependência de uma única pessoa.", impact: { governance: 10, social: 3 } },
         { id: "reduce", label: "Reduzir cultivos antes do recesso e manter apenas o essencial", feedback: "Reduzir a demanda é uma decisão prudente quando a equipe é pequena.", impact: { governance: 6, environmental: 3 } },
-        { id: "hope", label: "Manter tudo e verificar a situação na volta", feedback: "Sem rotina definida, perdas e riscos de abandono tornam-se mais prováveis.", impact: { governance: -12, environmental: -7 } }
+        { id: "hope", label: "Manter tudo e verificar apenas na volta", feedback: "Sem cuidados combinados, aumentam as chances de perdas e abandono.", impact: { governance: -12, environmental: -7 } }
       ]
     },
     {
       id: "waterRestriction", title: "Restrição de água", problem: "A escola passa a ter acesso irregular à água.",
       options: [
-        { id: "adapt", label: "Reduzir a escala, cobrir o solo e priorizar espécies compatíveis", feedback: "A adaptação aproxima a demanda da disponibilidade real.", impact: { environmental: 10, governance: 4 } },
-        { id: "capture", label: "Avaliar captação e armazenamento com orientação local", feedback: "A alternativa pode ajudar, mas depende de segurança, normas e manutenção.", impact: { environmental: 6, governance: 2 } },
+        { id: "adapt", label: "Reduzir o tamanho, proteger o solo e escolher plantas que usem menos água", feedback: "A mudança aproxima a necessidade de água da quantidade realmente disponível.", impact: { environmental: 10, governance: 4 } },
+        { id: "capture", label: "Avaliar captação e armazenamento com orientação técnica", feedback: "Essa alternativa pode ajudar, mas depende de segurança, regras locais e manutenção.", impact: { environmental: 6, governance: 2 } },
         { id: "unchanged", label: "Manter o plano sem alterações", feedback: "Diversidade ou área ampla não compensam uma fonte hídrica incerta.", impact: { environmental: -14, governance: -5 } }
       ]
     },
     {
       id: "volunteers", title: "Perda de voluntários", problem: "Metade da equipe deixa de participar da manutenção.",
       options: [
-        { id: "resize", label: "Redimensionar o plano e registrar novas responsabilidades", feedback: "A escala foi alinhada à capacidade atual de cuidado.", impact: { governance: 9, social: 4 } },
-        { id: "recruit", label: "Mobilizar novos apoios antes de manter a escala", feedback: "A continuidade depende de compromissos confirmados, não apenas convites.", impact: { social: 7, governance: 3 } },
+        { id: "resize", label: "Diminuir o plano e dividir novamente as tarefas", feedback: "O tamanho da horta passa a combinar melhor com a equipe disponível.", impact: { governance: 9, social: 4 } },
+        { id: "recruit", label: "Buscar novos apoios antes de manter o tamanho", feedback: "A continuidade depende de pessoas que confirmem sua participação.", impact: { social: 7, governance: 3 } },
         { id: "overload", label: "Concentrar todas as tarefas em uma pessoa", feedback: "A sobrecarga fragiliza continuidade, participação e segurança.", impact: { social: -12, governance: -9 } }
       ]
     },
     {
       id: "pests", title: "Aparecimento de pragas", problem: "Folhas apresentam danos e a causa ainda não foi confirmada.",
       options: [
-        { id: "observe", label: "Observar, registrar e buscar manejo agroecológico orientado", feedback: "Diagnóstico cuidadoso evita respostas precipitadas e amplia a aprendizagem.", impact: { environmental: 8, pedagogical: 5 } },
-        { id: "remove", label: "Isolar plantas afetadas e revisar as condições do cultivo", feedback: "A medida preventiva ganha valor quando acompanhada de registro.", impact: { environmental: 5, governance: 2 } },
+        { id: "observe", label: "Observar, registrar e buscar orientação para um cuidado agroecológico", feedback: "Observar antes de agir evita decisões apressadas e pode virar uma atividade de aprendizagem.", impact: { environmental: 8, pedagogical: 5 } },
+        { id: "remove", label: "Separar as plantas afetadas e revisar as condições do cultivo", feedback: "A medida ajuda mais quando a equipe também registra o que aconteceu.", impact: { environmental: 5, governance: 2 } },
         { id: "chemical", label: "Aplicar produto químico sem orientação", feedback: "Aplicações sem orientação trazem riscos sanitários e contrariam o uso educacional seguro.", impact: { environmental: -16, social: -10 } }
       ]
     },
     {
       id: "budgetCut", title: "Redução de orçamento", problem: "O recurso disponível foi reduzido antes da implantação.",
       options: [
-        { id: "phase", label: "Implantar por etapas e priorizar segurança, água e circulação", feedback: "O faseamento preserva funções essenciais e torna custos transparentes.", impact: { governance: 9, social: 2 } },
-        { id: "reuse", label: "Reavaliar materiais locais seguros e reduzir a escala", feedback: "Reuso responsável pode ajudar quando segurança e durabilidade são verificadas.", impact: { environmental: 4, governance: 5 } },
+        { id: "phase", label: "Começar por etapas e priorizar segurança, água e caminhos", feedback: "Começar aos poucos preserva o essencial e facilita o controle dos gastos.", impact: { governance: 9, social: 2 } },
+        { id: "reuse", label: "Reavaliar materiais locais seguros e reduzir o tamanho", feedback: "Reutilizar materiais pode ajudar quando segurança e durabilidade são verificadas.", impact: { environmental: 4, governance: 5 } },
         { id: "cutaccess", label: "Eliminar caminhos e itens de acessibilidade", feedback: "Economizar retirando acesso compromete participação e segurança.", impact: { social: -16, governance: -6 } }
       ]
     },
     {
       id: "teamChange", title: "Mudança da equipe", problem: "A coordenação do projeto muda no meio do ano.",
       options: [
-        { id: "handover", label: "Fazer transição com registros, calendário e critérios de pausa", feedback: "Documentação torna o plano menos dependente de uma pessoa.", impact: { governance: 11, pedagogical: 2 } },
-        { id: "meeting", label: "Revalidar objetivos e responsabilidades com a nova equipe", feedback: "A revisão coletiva evita que o plano antigo seja assumido sem contexto.", impact: { governance: 8, social: 5 } },
+        { id: "handover", label: "Entregar os registros, o calendário e os critérios de pausa", feedback: "Os registros tornam o plano menos dependente de uma única pessoa.", impact: { governance: 11, pedagogical: 2 } },
+        { id: "meeting", label: "Rever objetivos e responsabilidades com a nova equipe", feedback: "A conversa evita que a nova equipe receba um plano sem conhecer suas razões.", impact: { governance: 8, social: 5 } },
         { id: "implicit", label: "Confiar em orientações informais", feedback: "Informações dispersas aumentam ambiguidades e perda de continuidade.", impact: { governance: -11 } }
       ]
     },
     {
       id: "accessDifficulty", title: "Dificuldade de acessibilidade", problem: "O percurso previsto não atende parte da comunidade escolar.",
       options: [
-        { id: "redesign", label: "Ampliar circulação e rever alcance com usuários e profissionais", feedback: "A adaptação precisa ser confirmada no local com participação das pessoas afetadas.", impact: { social: 12, governance: 3 } },
+        { id: "redesign", label: "Ampliar os caminhos e rever o alcance com usuários e profissionais", feedback: "A adaptação precisa ser confirmada no local com a participação das pessoas afetadas.", impact: { social: 12, governance: 3 } },
         { id: "alternate", label: "Criar atividades equivalentes enquanto o espaço é revisto", feedback: "A medida reduz exclusão imediata, mas não encerra a necessidade de adequação física.", impact: { social: 6, pedagogical: 3 } },
-        { id: "separate", label: "Manter o espaço e separar quem não consegue acessar", feedback: "A segregação não resolve a barreira e reduz a participação.", impact: { social: -18, pedagogical: -5 } }
+        { id: "separate", label: "Manter o espaço e afastar quem não consegue acessá-lo", feedback: "Separar as pessoas não resolve a barreira e reduz a participação.", impact: { social: -18, pedagogical: -5 } }
       ]
     },
     {
-      id: "overload", title: "Excesso de componentes", problem: "O plano reúne mais zonas e rotinas do que a equipe consegue cuidar.",
+      id: "overload", title: "Itens demais para cuidar", problem: "O plano reúne mais espaços e rotinas do que a equipe consegue cuidar.",
       options: [
-        { id: "simplify", label: "Remover componentes e manter funções prioritárias", feedback: "Simplificar aumenta a chance de continuidade e permite aprender por etapas.", impact: { governance: 9, environmental: 3 } },
-        { id: "phase", label: "Organizar implantação gradual com critérios de avanço", feedback: "Fases tornam a expansão dependente de evidências de capacidade.", impact: { governance: 8, pedagogical: 3 } },
-        { id: "keep", label: "Manter todos os componentes para não perder oportunidades", feedback: "Quantidade de componentes não garante aprendizagem e pode ampliar abandono.", impact: { governance: -12, environmental: -5 } }
+        { id: "simplify", label: "Remover alguns itens e manter o que é mais importante", feedback: "Simplificar aumenta a chance de continuidade e permite aprender por etapas.", impact: { governance: 9, environmental: 3 } },
+        { id: "phase", label: "Começar aos poucos e só ampliar quando a equipe estiver pronta", feedback: "A ampliação passa a depender da capacidade de cuidado já demonstrada.", impact: { governance: 8, pedagogical: 3 } },
+        { id: "keep", label: "Manter todos os itens para não perder oportunidades", feedback: "Ter muitos itens não garante aprendizagem e pode aumentar o risco de abandono.", impact: { governance: -12, environmental: -5 } }
       ]
     }
   ];
@@ -275,7 +275,7 @@
 
   window.HortaLab = window.HortaLab || {};
   Object.assign(window.HortaLab, {
-    APP_VERSION: "2.3.0",
+    APP_VERSION: "2.4.0",
     COMPONENT_TYPES,
     SCENARIOS,
     CURRICULAR,

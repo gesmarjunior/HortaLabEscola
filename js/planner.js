@@ -3,7 +3,7 @@
 
   const HL = window.HortaLab;
   const DB = window.HortaLocalDB;
-  const STORAGE_VERSION = 3;
+  const STORAGE_VERSION = 4;
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
   const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -41,17 +41,25 @@
     return {
       schemaVersion: STORAGE_VERSION,
       step: 1,
-      essentials: { purpose: "learning", availableArea: 25, water: "regular", responsibles: 2 },
+      furthestStep: 1,
+      essentials: {
+        purpose: "learning", availableArea: 25, sunlight: "unknown", water: "regular",
+        soil: "unknown", accessibility: "unknown", responsibles: 2, vacation: "none",
+        budget: "unknown", tools: "unknown"
+      },
       scenarioId: "compact",
       components: seedComponents("compact"),
       selectedId: null,
       activities: [],
       note: "",
+      care: { routine: "undefined", backup: "none", costTracking: "no", pauseCriteria: "no" },
+      eventDecisions: {},
+      activeEventId: "vacation",
       plotView: "map",
       showGrid: true,
       zoom: 1,
       rotation: 0,
-      layoutVersion: 3,
+      layoutVersion: 4,
       updatedAt: new Date().toISOString()
     };
   }
@@ -74,22 +82,31 @@
       }));
     if (areaTotal(components) > scenario.area + 0.01) return base;
     const selectedId = components.some((item) => item.id === raw.selectedId) ? raw.selectedId : null;
+    const eventDecisions = Object.fromEntries(Object.entries(raw.eventDecisions || {}).filter(([eventId, optionId]) => {
+      const event = HL.EVENTS.find((item) => item.id === eventId);
+      return event?.options.some((option) => option.id === optionId);
+    }));
+    const migratedStep = Number(raw.schemaVersion) < 4 && Number(raw.step) === 6 ? 7 : Number(raw.step) || 1;
     return {
       ...base,
       ...raw,
       schemaVersion: STORAGE_VERSION,
       scenarioId: scenario.id,
-      essentials: { ...base.essentials, ...(raw.essentials || {}) },
+      essentials: { ...base.essentials, ...(raw.diagnosis || {}), ...(raw.essentials || {}) },
       components,
       selectedId,
       activities: Array.isArray(raw.activities) ? raw.activities.filter((item) => typeof item === "string") : [],
-      note: typeof raw.note === "string" ? raw.note.slice(0, 400) : "",
+      note: typeof (raw.note ?? raw.pedagogyNote) === "string" ? String(raw.note ?? raw.pedagogyNote).slice(0, 400) : "",
+      care: { ...base.care, ...(raw.care || {}) },
+      eventDecisions,
+      activeEventId: HL.EVENTS.some((item) => item.id === raw.activeEventId) ? raw.activeEventId : "vacation",
       plotView: raw.plotView === "list" ? "list" : "map",
       showGrid: raw.showGrid !== false,
-      step: clamp(Number(raw.step) || 1, 1, 6),
+      step: clamp(migratedStep, 1, 7),
+      furthestStep: clamp(Math.max(Number(raw.furthestStep) || 1, migratedStep), 1, 7),
       zoom: clamp(Number(raw.zoom) || 1, 0.85, 1.15),
       rotation: Number(raw.rotation) === 1 ? 1 : 0,
-      layoutVersion: 3
+      layoutVersion: 4
     };
   }
 
@@ -128,7 +145,7 @@
     clearTimeout(saveTimer);
     state.updatedAt = new Date().toISOString();
     pendingSave = pendingSave.catch(() => undefined).then(() => DB.saveState(clone(state)));
-    pendingSave.then(() => setStorageStatus("SQLite local · salvo", "ready")).catch(() => setStorageStatus("SQLite local · erro ao salvar", "error"));
+    pendingSave.then(() => setStorageStatus("Plano salvo aqui", "ready")).catch(() => setStorageStatus("Não foi possível salvar", "error"));
     return pendingSave;
   }
 
@@ -141,11 +158,16 @@
   }
 
   function setStep(next) {
-    state.step = clamp(Number(next) || 1, 1, 6);
+    state.step = clamp(Number(next) || 1, 1, 7);
+    state.furthestStep = Math.max(state.furthestStep || 1, state.step);
     save();
     renderAll();
     const heading = $(`[data-v2-panel="${state.step}"] h2`);
-    if (heading) { heading.setAttribute("tabindex", "-1"); heading.focus({ preventScroll: true }); }
+    if (heading) {
+      heading.setAttribute("tabindex", "-1");
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: "start", behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
   }
 
   function selectScenario(id) {
@@ -163,10 +185,10 @@
     const available = Number(state.essentials.availableArea || 0);
     const people = Number(state.essentials.responsibles || 0);
     const reasons = [];
-    if (available && available < item.area) reasons.push(`a área informada é menor que ${item.area} m²`);
-    if (item.area === 50 && people < 3) reasons.push("a escala ampliada costuma exigir ao menos três pessoas ativas");
-    if (item.area >= 25 && state.essentials.water !== "regular") reasons.push("a água ainda precisa ser confirmada para uma escala maior");
-    return reasons.length ? `Atenção: ${reasons.join("; ")}.` : `Boa hipótese para ${item.bestFor.toLowerCase()}`;
+    if (available && available < item.area) reasons.push(`o espaço informado é menor que ${item.area} m²`);
+    if (item.area === 50 && people < 3) reasons.push("esse tamanho costuma exigir pelo menos três pessoas ativas");
+    if (item.area >= 25 && state.essentials.water !== "regular") reasons.push("o acesso à água ainda não está garantido");
+    return reasons.length ? `Antes de escolher este tamanho, considere que ${reasons.join(" e ")}.` : `Este tamanho pode ser um bom ponto de partida. ${item.bestFor}`;
   }
 
   function renderProgress() {
@@ -174,6 +196,7 @@
       const step = Number(button.dataset.v2Step);
       if (step === state.step) button.setAttribute("aria-current", "step"); else button.removeAttribute("aria-current");
       button.dataset.complete = step < state.step ? "true" : "false";
+      button.disabled = step > state.furthestStep;
     });
     $$('[data-v2-panel]').forEach((panel) => { panel.hidden = Number(panel.dataset.v2Panel) !== state.step; });
   }
@@ -316,7 +339,7 @@
       const labelMarkup = interactive && item.id === state.selectedId ? `<text class="iso-label" x="${point[0]}" y="${point[1] - labelLift}" text-anchor="middle">${escapeHtml(type.short)}</text>` : "";
       return `<g class="iso-hit${interactive && item.id === state.selectedId ? " is-selected" : ""}" data-iso-id="${item.id}" data-iso-type="${item.type}"${interactive ? ' tabindex="0" role="button"' : ""} aria-label="${label}">${spriteFor(item.type, x, y)}${labelMarkup}</g>`;
     }).join("");
-    svg.innerHTML = `${svgDefs(prefix)}<title id="${prefix === "layout" ? "v2IsoTitle" : "v2CompositionTitle"}">${interactive ? "Montagem isométrica da horta" : "Prévia da composição"}</title><desc id="${prefix === "layout" ? "v2IsoDesc" : "v2CompositionDesc"}">${scenario().name}, ${scenario().area} metros quadrados, com ${state.components.length} componentes.</desc><g class="iso-world">${terrain.join("")}${boundary}${objects}</g>`;
+    svg.innerHTML = `${svgDefs(prefix)}<title id="${prefix === "layout" ? "v2IsoTitle" : "v2CompositionTitle"}">${interactive ? "Maquete 3D da horta" : "Prévia dos espaços escolhidos"}</title><desc id="${prefix === "layout" ? "v2IsoDesc" : "v2CompositionDesc"}">${scenario().name}, ${scenario().area} metros quadrados, com ${state.components.length} itens.</desc><g class="iso-world">${terrain.join("")}${boundary}${objects}</g>`;
     if (!interactive) return;
     $$('[data-iso-id]', svg).forEach((node) => {
       node.addEventListener("click", () => selectComponent(node.dataset.isoId));
@@ -337,16 +360,72 @@
     $("#v2LayoutMeter").style.width = `${Math.min(100, (total / current.area) * 100)}%`;
     $("#v2LayoutCount").textContent = `${state.components.length} ${state.components.length === 1 ? "item" : "itens"}`;
     $("#v2LayoutList").innerHTML = state.components.map((item) => { const type = HL.COMPONENT_TYPES[item.type]; return `<li><button type="button" class="${item.id === state.selectedId ? "is-selected" : ""}" data-v2-layout-select="${item.id}"><span class="v2-component-icon" style="color:${type.color}" aria-hidden="true">${type.icon}</span><span>${type.short}</span><small>${formatArea(item.area)} m²</small></button></li>`; }).join("");
-    $("#v2SelectedTitle").textContent = selectedItem ? HL.COMPONENT_TYPES[selectedItem.type].label : "Selecione uma zona";
-    $("#v2SelectedHelp").textContent = selectedItem ? "Use o direcional ou as setas do teclado. A peça segue a direção vista na tela." : "Clique em um item da cena ou da lista.";
+    $("#v2SelectedTitle").textContent = selectedItem ? HL.COMPONENT_TYPES[selectedItem.type].label : "Escolha um item";
+    $("#v2SelectedHelp").textContent = selectedItem ? "Use o controle com setas ou as setas do teclado. O item seguirá a direção mostrada na tela." : "Escolha um item na imagem ou na lista.";
     $("#v2RemoveSelected").disabled = !selectedItem;
     renderIsoInto($("#v2IsoCanvas"), true);
+  }
+
+  function updateActivityHint() {
+    const count = state.activities.length;
+    const hint = $("#v2ActivityHint");
+    if (hint) {
+      hint.textContent = count >= 2 ? `${count} atividades escolhidas. Você já pode continuar.` : `Escolha mais ${2 - count} ${count === 1 ? "atividade" : "atividades"} para ligar a horta ao trabalho pedagógico.`;
+      hint.dataset.tone = count >= 2 ? "ready" : "attention";
+    }
   }
 
   function renderActivities() {
     const choices = HL.ACTIVITIES.flatMap((group) => group.options.slice(0, 1).map(([id, name, description]) => ({ id, name, description, subject: group.name })));
     $("#v2Activities").innerHTML = choices.map((item) => `<label class="v2-activity"><input type="checkbox" value="${item.id}" ${state.activities.includes(item.id) ? "checked" : ""}><span><strong>${item.name}</strong><span>${item.subject} · ${item.description}</span></span></label>`).join("");
     $("#v2Note").value = state.note;
+    updateActivityHint();
+    const careForm = $("#v2CarePlan");
+    if (careForm) Object.entries(state.care).forEach(([name, value]) => { const input = careForm.elements[name]; if (input && input.value !== value) input.value = value; });
+  }
+
+  function renderEvents() {
+    const picker = $("#v2EventPicker");
+    const card = $("#v2EventCard");
+    if (!picker || !card) return;
+    picker.innerHTML = HL.EVENTS.map((item) => `<option value="${item.id}" ${item.id === state.activeEventId ? "selected" : ""}>${escapeHtml(item.title)}</option>`).join("");
+    const event = HL.EVENTS.find((item) => item.id === state.activeEventId) || HL.EVENTS[0];
+    const decision = state.eventDecisions[event.id];
+    const selectedOption = event.options.find((item) => item.id === decision);
+    card.innerHTML = `<div class="v2-event-question"><h4>${escapeHtml(event.title)}</h4><p>${escapeHtml(event.problem)}</p></div>
+      <fieldset class="v2-event-options"><legend>O que a escola faria?</legend>${event.options.map((option) => `<label><input type="radio" name="eventDecision" value="${option.id}" ${decision === option.id ? "checked" : ""}><span>${escapeHtml(option.label)}</span></label>`).join("")}</fieldset>
+      <div class="v2-event-feedback" ${selectedOption ? "" : "hidden"}>${selectedOption ? `<strong>O que essa escolha muda</strong><p>${escapeHtml(selectedOption.feedback)}</p>` : ""}</div>`;
+  }
+
+  function renderFeasibility() {
+    const container = $("#v2Feasibility");
+    if (!container || typeof HL.evaluatePlan !== "function") return;
+    const result = HL.evaluatePlan({ ...state, diagnosis: state.essentials, pedagogyNote: state.note });
+    container.innerHTML = Object.values(result.dimensions).map((dimension) => {
+      const helps = dimension.contributions[0] || "Ainda não há uma escolha que fortaleça este ponto.";
+      const risk = dimension.risks[0] || "Nenhum risco principal apareceu nas respostas atuais.";
+      const improvement = dimension.improvements[0] || "Mantenha esta parte do plano e confirme as condições no local.";
+      const confirmation = dimension.confirmations[0] || "Confirme esta informação com a equipe da escola.";
+      return `<article class="v2-indicator" data-tone="${dimension.tone}"><header><h4>${escapeHtml(dimension.label)}</h4><strong>${dimension.score}<span> de 100</span></strong></header><div class="v2-indicator-bar" role="img" aria-label="${escapeHtml(dimension.label)}: ${dimension.score} de 100"><span style="width:${dimension.score}%"></span></div><p class="v2-indicator-status">${escapeHtml(dimension.statusLabel)}</p><dl><div><dt>O que ajuda</dt><dd>${escapeHtml(helps)}</dd></div><div><dt>Atenção</dt><dd>${escapeHtml(risk)}</dd></div><div><dt>Próximo ajuste</dt><dd>${escapeHtml(improvement)}</dd></div><div><dt>Confirme na escola</dt><dd>${escapeHtml(confirmation)}</dd></div></dl></article>`;
+    }).join("");
+  }
+
+  function labelFor(group, value) {
+    const labels = {
+      purpose: { learning: "Aulas de diferentes disciplinas", environment: "Educação ambiental", community: "Participação da comunidade", experiment: "Experiência pequena" },
+      sunlight: { unknown: "ainda não observado", high: "mais de 6 horas por dia", medium: "entre 4 e 6 horas por dia", low: "menos de 4 horas por dia" },
+      water: { regular: "regular e perto", limited: "limitado ou distante", seasonal: "varia durante o ano", unknown: "ainda não confirmado" },
+      soil: { unknown: "ainda não avaliado", known: "aparentemente adequado", containers: "uso de recipientes ou canteiros elevados", poor: "compactado, encharcado ou degradado" },
+      accessibility: { unknown: "ainda será conversado", required: "precisa de adaptação", desirable: "pode ser melhorado", none: "nenhuma necessidade identificada" },
+      vacation: { none: "sem plano para férias", partial: "plano incompleto para férias", covered: "responsáveis e substitutos combinados" },
+      budget: { unknown: "ainda não estimado", defined: "valor reservado", limited: "recursos limitados", none: "sem recurso reservado" },
+      tools: { unknown: "ainda não verificadas", enough: "conjunto básico disponível", partial: "parte do necessário", none: "ainda não disponíveis" },
+      routine: { undefined: "frequência não combinada", daily: "todos os dias letivos", fewTimes: "duas ou três vezes por semana", weekly: "uma vez por semana" },
+      backup: { none: "sem substituto", partial: "substituto ainda não confirmado", defined: "substituto combinado" },
+      costTracking: { no: "sem registro definido", planned: "registro será organizado", yes: "registro previsto" },
+      pauseCriteria: { no: "sem critérios definidos", planned: "critérios serão combinados", yes: "critérios já combinados" }
+    };
+    return labels[group]?.[value] || value || "não informado";
   }
 
   function renderSummary() {
@@ -354,11 +433,21 @@
     const total = areaTotal(state.components);
     const grouped = state.components.reduce((acc, item) => { const label = HL.COMPONENT_TYPES[item.type].label; acc[label] = (acc[label] || 0) + Number(item.area); return acc; }, {});
     const activityNames = HL.ACTIVITIES.flatMap((group) => group.options).filter(([id]) => state.activities.includes(id)).map(([, name]) => name);
-    $("#v2Summary").innerHTML = `<div class="v2-summary-hero"><div><strong>${current.area} m² · ${current.name}</strong><span> ${formatArea(total)} m² distribuídos · ${state.components.length} zonas</span></div><span>Uso orientativo, não validação técnica.</span></div>
-      <section class="v2-summary-block"><h3>Composição</h3><ul>${Object.entries(grouped).map(([label, value]) => `<li>${escapeHtml(label)} — ${formatArea(value)} m²</li>`).join("")}</ul></section>
-      <section class="v2-summary-block"><h3>Atividades</h3>${activityNames.length ? `<ul>${activityNames.map((name) => `<li>${escapeHtml(name)}</li>`).join("")}</ul>` : "<p>Nenhuma atividade selecionada ainda.</p>"}</section>
-      <section class="v2-summary-block"><h3>Condições anotadas</h3><p>${escapeHtml(state.essentials.responsibles)} pessoas · água ${escapeHtml(state.essentials.water)} · área disponível ${escapeHtml(state.essentials.availableArea)} m².</p>${state.note ? `<p><strong>Intenção:</strong> ${escapeHtml(state.note)}</p>` : ""}</section>
-      <section class="v2-summary-block"><h3>Próximo passo</h3><p>Confirme no local o percurso, a segurança, a água, o solo, o alcance e a rotina de cuidado antes de qualquer implantação.</p></section>`;
+    const evaluation = typeof HL.evaluatePlan === "function" ? HL.evaluatePlan({ ...state, diagnosis: state.essentials, pedagogyNote: state.note }) : null;
+    const decisions = HL.EVENTS.map((event) => ({ event, option: event.options.find((option) => option.id === state.eventDecisions[event.id]) })).filter((item) => item.option);
+    const risks = evaluation ? [...new Set(Object.values(evaluation.dimensions).flatMap((item) => item.risks))].slice(0, 5) : [];
+    const improvements = evaluation ? [...new Set(Object.values(evaluation.dimensions).flatMap((item) => item.improvements))].slice(0, 5) : [];
+    $("#v2Summary").innerHTML = `<div class="v2-summary-hero"><div><strong>${current.area} m² · ${current.name}</strong><span>${formatArea(total)} m² distribuídos em ${state.components.length} itens</span></div><span>Plano para conversa e revisão local.</span></div>
+      <section class="v2-summary-block"><h3>Realidade informada</h3><ul><li>Finalidade: ${escapeHtml(labelFor("purpose", state.essentials.purpose))}</li><li>Espaço disponível: ${escapeHtml(state.essentials.availableArea)} m²</li><li>Sol: ${escapeHtml(labelFor("sunlight", state.essentials.sunlight))}</li><li>Água: ${escapeHtml(labelFor("water", state.essentials.water))}</li><li>Solo: ${escapeHtml(labelFor("soil", state.essentials.soil))}</li><li>Acesso: ${escapeHtml(labelFor("accessibility", state.essentials.accessibility))}</li><li>Orçamento: ${escapeHtml(labelFor("budget", state.essentials.budget))}</li><li>Ferramentas: ${escapeHtml(labelFor("tools", state.essentials.tools))}</li></ul></section>
+      <section class="v2-summary-block"><h3>Espaços escolhidos</h3><ul>${Object.entries(grouped).map(([label, value]) => `<li>${escapeHtml(label)} — ${formatArea(value)} m²</li>`).join("")}</ul></section>
+      <section class="v2-summary-block"><h3>Uso nas aulas</h3>${activityNames.length ? `<ul>${activityNames.map((name) => `<li>${escapeHtml(name)}</li>`).join("")}</ul>` : "<p>Nenhuma atividade foi escolhida.</p>"}${state.note ? `<p><strong>Intenção pedagógica:</strong> ${escapeHtml(state.note)}</p>` : ""}</section>
+      <section class="v2-summary-block"><h3>Equipe e cuidados</h3><ul><li>${escapeHtml(state.essentials.responsibles)} pessoas podem dividir os cuidados</li><li>${escapeHtml(labelFor("vacation", state.essentials.vacation))}</li><li>${escapeHtml(labelFor("routine", state.care.routine))}</li><li>${escapeHtml(labelFor("backup", state.care.backup))}</li><li>Gastos: ${escapeHtml(labelFor("costTracking", state.care.costTracking))}</li><li>Pausa: ${escapeHtml(labelFor("pauseCriteria", state.care.pauseCriteria))}</li></ul></section>
+      <section class="v2-summary-block"><h3>Imprevistos testados</h3>${decisions.length ? `<ul>${decisions.map(({ event, option }) => `<li><strong>${escapeHtml(event.title)}:</strong> ${escapeHtml(option.label)}</li>`).join("")}</ul>` : "<p>Nenhum imprevisto foi testado.</p>"}</section>
+      <section class="v2-summary-block"><h3>Ordem sugerida</h3><ol><li>Antes de implantar: confirmar o local, a segurança, o acesso à água e as pessoas responsáveis.</li><li>Primeiro ciclo: preparar somente os espaços e as atividades que a equipe consegue acompanhar.</li><li>Durante as aulas: observar, cuidar e registrar conforme a frequência combinada.</li><li>Antes dos recessos: rever os cultivos e confirmar responsáveis e substitutos.</li></ol><p>Ajuste os períodos ao calendário da escola e às plantas escolhidas.</p></section>
+      <section class="v2-summary-block"><h3>Como o plano está</h3>${evaluation ? `<ul>${Object.values(evaluation.dimensions).map((item) => `<li><strong>${escapeHtml(item.label)}:</strong> ${item.score} de 100 — ${escapeHtml(item.statusLabel)}</li>`).join("")}</ul>` : ""}<p>Os valores orientam a revisão e não certificam a horta.</p></section>
+      <section class="v2-summary-block"><h3>Pontos de atenção</h3>${risks.length ? `<ul>${risks.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : "<p>Nenhum ponto principal apareceu nas respostas atuais.</p>"}</section>
+      <section class="v2-summary-block"><h3>Próximos ajustes</h3>${improvements.length ? `<ul>${improvements.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}<p>Antes de implantar, confirme no local o percurso, a segurança, a água, o solo, o alcance e a rotina de cuidados.</p></section>
+      <section class="v2-summary-block v2-summary-wide"><h3>Limites e referências</h3><p>Este plano é educacional. Ele não prevê produtividade, não autoriza a implantação e não substitui avaliação agronômica, sanitária, nutricional, de acessibilidade ou de segurança.</p><p>Referências de apoio: FAO, <em>Setting up and running a school garden</em> (2005); Embrapa, <em>Como plantar hortaliças</em> (2006).</p></section>`;
   }
 
   function compositionCard(item, index, current) {
@@ -378,12 +467,12 @@
     const grid = $("#v2PlotGrid");
     if (!grid) return;
     $("#v2CompositionScenario").textContent = `${current.area} m² — ${current.name}`;
-    $("#v2CompositionArea").textContent = `${formatArea(total)} de ${formatArea(current.area)} m² utilizados`;
+    $("#v2CompositionArea").textContent = `${formatArea(total)} de ${formatArea(current.area)} m² usados`;
     $("#v2CompositionMeter").style.width = `${percent}%`;
     grid.dataset.view = state.plotView;
     grid.classList.toggle("is-grid-hidden", !state.showGrid);
-    grid.innerHTML = state.components.length ? state.components.map((item, index) => compositionCard(item, index, current)).join("") : '<li class="v2-plot-empty">O mapa está vazio. Adicione um componente pela biblioteca.</li>';
-    $("#v2CompositionMessage").textContent = remaining > 0 ? `${formatArea(remaining)} m² livres. Espaço livre também apoia segurança e adaptação.` : "A área está totalmente distribuída. Para adicionar algo, reduza ou remova outro componente.";
+    grid.innerHTML = state.components.length ? state.components.map((item, index) => compositionCard(item, index, current)).join("") : '<li class="v2-plot-empty">O mapa está vazio. Escolha um item na lista ao lado.</li>';
+    $("#v2CompositionMessage").textContent = remaining > 0 ? `${formatArea(remaining)} m² livres. Deixar espaço livre pode melhorar a circulação e permitir mudanças.` : "Todo o espaço foi distribuído. Para incluir outro item, reduza ou remova um dos atuais.";
     $("#v2CompositionMessage").dataset.tone = remaining <= 0 ? "warning" : "info";
     $$('[data-v2-plot-view]').forEach((button) => {
       const active = button.dataset.v2PlotView === state.plotView;
@@ -410,7 +499,7 @@
     }
   }
 
-  function renderAll() { renderProgress(); renderEssentials(); renderScenarios(); renderLibrary(); renderComposition(); renderLayout(); renderActivities(); renderSummary(); }
+  function renderAll() { renderProgress(); renderEssentials(); renderScenarios(); renderLibrary(); renderComposition(); renderLayout(); renderActivities(); renderEvents(); renderFeasibility(); renderSummary(); }
 
   function addComponent(type) {
     const current = scenario();
@@ -457,7 +546,7 @@
     [next[index], next[target]] = [next[target], next[index]];
     state.components = next;
     save(true); renderAll();
-    announce(`Componente movido para ${target + 1} de ${next.length}.`);
+    announce(`Item movido para a posição ${target + 1} de ${next.length}.`);
   }
 
   function reorderComponent(sourceId, targetId) {
@@ -471,14 +560,14 @@
     state.components = next;
     state.selectedId = moved.id;
     save(true); renderAll();
-    announce(`${HL.COMPONENT_TYPES[moved.type].label} reposicionado na composição.`);
+    announce(`${HL.COMPONENT_TYPES[moved.type].label} mudou de posição no mapa.`);
   }
 
   function toggleGrid() {
     recordHistory();
     state.showGrid = !state.showGrid;
     save(); renderComposition();
-    announce(state.showGrid ? "Grade exibida." : "Grade ocultada.");
+    announce(state.showGrid ? "Linhas do mapa exibidas." : "Linhas do mapa ocultadas.");
   }
 
   function nudgeSelected(key) {
@@ -507,20 +596,20 @@
 
   async function exportPlan() {
     await persistNow();
-    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.3.0", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
-    announce("Plano JSON exportado.");
+    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.4.0", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
+    announce("Uma cópia do plano foi salva.");
   }
 
   async function exportSqlite() {
-    try { await persistNow(); downloadBlob(await DB.exportSqlite(), "hortalab-escola.sqlite"); announce("Banco SQLite exportado."); }
-    catch (error) { announce(`Não foi possível exportar o SQLite: ${error.message}`); }
+    try { await persistNow(); downloadBlob(await DB.exportSqlite(), "hortalab-escola.sqlite"); announce("Uma cópia completa foi salva."); }
+    catch (error) { announce(`Não foi possível salvar a cópia completa: ${error.message}`); }
   }
 
   function importedState(payload) {
     const candidate = payload?.state || payload;
-    if (!candidate || !HL.SCENARIOS.some((item) => item.id === candidate.scenarioId) || !Array.isArray(candidate.components)) throw new Error("O arquivo não contém um plano HortaLab reconhecido.");
+    if (!candidate || !HL.SCENARIOS.some((item) => item.id === candidate.scenarioId) || !Array.isArray(candidate.components)) throw new Error("Este arquivo não contém um plano do HortaLab Escola.");
     const result = normalizeState(candidate);
-    if (result.scenarioId !== candidate.scenarioId || areaTotal(result.components) > scenarioFor(candidate.scenarioId).area + .01) throw new Error("A composição do arquivo excede o cenário escolhido.");
+    if (result.scenarioId !== candidate.scenarioId || areaTotal(result.components) > scenarioFor(candidate.scenarioId).area + .01) throw new Error("Os espaços desse arquivo ultrapassam o tamanho escolhido.");
     return result;
   }
 
@@ -533,17 +622,17 @@
       } else {
         state = normalizeState(await DB.importSqlite(await file.arrayBuffer()));
       }
-      renderAll(); announce("Plano importado e salvo neste dispositivo.");
-    } catch (error) { announce(`Importação não aplicada: ${error.message}`); }
+      renderAll(); announce("A cópia foi aberta e salva neste dispositivo.");
+    } catch (error) { announce(`Não foi possível abrir a cópia: ${error.message}`); }
   }
 
   async function reset() {
-    if (!window.confirm("Apagar o plano salvo neste dispositivo e começar novamente?")) return;
+    if (!window.confirm("Apagar este plano deste dispositivo e começar outro?")) return;
     history = [];
     future = [];
     state = defaultState();
     try { await DB.clear(); await persistNow(); renderAll(); announce("Plano apagado e reiniciado."); }
-    catch (error) { announce(`Não foi possível reiniciar o SQLite: ${error.message}`); }
+    catch (error) { announce(`Não foi possível apagar o plano salvo: ${error.message}`); }
   }
 
   function bindEvents() {
@@ -587,8 +676,17 @@
     $("#v2Rotate")?.addEventListener("click", () => { recordHistory(); state.rotation = state.rotation ? 0 : 1; save(true); renderLayout(); announce("Vista girada."); });
     $("#v2ZoomIn")?.addEventListener("click", () => { recordHistory(); state.zoom = clamp(Math.round((state.zoom + .1) * 10) / 10, .85, 1.15); save(); renderLayout(); });
     $("#v2ZoomOut")?.addEventListener("click", () => { recordHistory(); state.zoom = clamp(Math.round((state.zoom - .1) * 10) / 10, .85, 1.15); save(); renderLayout(); });
-    $("#v2Activities")?.addEventListener("change", (event) => { if (event.target.matches("input")) { state.activities = $$('input:checked', $("#v2Activities")).map((input) => input.value); save(); } });
-    $("#v2Note")?.addEventListener("input", (event) => { state.note = event.target.value.slice(0, 400); save(); });
+    $("#v2Activities")?.addEventListener("change", (event) => { if (event.target.matches("input")) { state.activities = $$('input:checked', $("#v2Activities")).map((input) => input.value); save(); updateActivityHint(); renderFeasibility(); renderSummary(); } });
+    $("#v2Note")?.addEventListener("input", (event) => { state.note = event.target.value.slice(0, 400); save(); renderFeasibility(); renderSummary(); });
+    $("#v2CarePlan")?.addEventListener("change", (event) => { const field = event.target; if (field.name) { state.care[field.name] = field.value; save(); renderFeasibility(); renderSummary(); } });
+    $("#v2EventPicker")?.addEventListener("change", (event) => { state.activeEventId = event.target.value; save(); renderEvents(); });
+    $("#v2EventCard")?.addEventListener("change", (event) => {
+      if (!event.target.matches('input[name="eventDecision"]')) return;
+      state.eventDecisions[state.activeEventId] = event.target.value;
+      save(true); renderEvents(); renderFeasibility(); renderSummary();
+      const currentEvent = HL.EVENTS.find((item) => item.id === state.activeEventId);
+      announce(`Escolha registrada para ${currentEvent?.title || "o imprevisto"}.`);
+    });
     $("#v2Print")?.addEventListener("click", () => window.print());
     $("#v2Export")?.addEventListener("click", exportPlan);
     $("#v2ExportSqlite")?.addEventListener("click", exportSqlite);
@@ -596,7 +694,15 @@
     $("#v2ResetTop")?.addEventListener("click", reset); $("#v2ResetBottom")?.addEventListener("click", reset);
     document.addEventListener("click", (event) => {
       const go = event.target.closest("[data-v2-step]"); if (go && go.dataset.v2Step) setStep(go.dataset.v2Step);
-      const next = event.target.closest("[data-v2-next]"); if (next) setStep(state.step + 1);
+      const next = event.target.closest("[data-v2-next]");
+      if (next) {
+        if (state.step === 5 && state.activities.length < 2) {
+          renderActivities();
+          announce("Escolha pelo menos duas atividades antes de continuar.");
+          return;
+        }
+        setStep(state.step + 1);
+      }
       const prev = event.target.closest("[data-v2-prev]"); if (prev) setStep(state.step - 1);
     });
   }
@@ -605,7 +711,7 @@
     bindEvents();
     renderAll();
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("./service-worker.js").catch(() => undefined);
-    setStorageStatus("SQLite local · conectando", "loading");
+    setStorageStatus("Abrindo seu plano", "loading");
     try {
       await DB.ready();
       const saved = await DB.loadState();
@@ -613,10 +719,10 @@
       dbReady = true;
       renderAll();
       await persistNow();
-      setStorageStatus("SQLite local · salvo", "ready");
+      setStorageStatus("Plano salvo aqui", "ready");
     } catch (error) {
-      setStorageStatus("SQLite local · indisponível", "error");
-      announce(`O plano continua disponível nesta sessão, mas o SQLite local não abriu: ${error.message}`);
+      setStorageStatus("Salvamento indisponível", "error");
+      announce(`O plano continua aberto nesta página, mas não foi possível salvá-lo neste dispositivo: ${error.message}`);
     }
   }
 
