@@ -4,9 +4,9 @@ Produto educacional estático para apoiar professores e gestores no planejamento
 
 ## Versão oficial e histórico
 
-O produto possui uma única entrada oficial em `index.html`. Na versão `2.4.1`, a linguagem está voltada a professores da educação básica e a jornada acompanha as tarefas previstas no projeto acadêmico: conhecer a realidade da escola, comparar tamanhos, escolher os espaços, organizar a maquete 3D, planejar aulas e cuidados, testar imprevistos e preparar o plano final. A atualização `2.4.1` amplia a área de clique/toque dos objetos 3D, ativa os controles de movimento somente após uma seleção e mostra o tamanho atual da imagem. Termos técnicos de informática permanecem fora da interface principal, sem eliminar o salvamento local, as exportações ou as regras determinísticas.
+O produto possui uma única entrada oficial em `index.html`. Na versão `2.4.2`, a linguagem está voltada a professores da educação básica e a jornada acompanha as tarefas previstas no projeto acadêmico: conhecer a realidade da escola, comparar tamanhos, escolher os espaços, organizar a maquete 3D, planejar aulas e cuidados, testar imprevistos e preparar o plano final. A atualização `2.4.2` acrescenta um manual de uso ilustrado em PDF à área de ajuda. A versão `2.4.1` ampliou a área de clique/toque dos objetos 3D, ativou os controles de movimento somente após uma seleção e passou a mostrar o tamanho atual da imagem. Termos técnicos de informática permanecem fora da interface principal, sem eliminar o salvamento local, as exportações ou as regras determinísticas.
 
-A versão anterior continua disponível na tag Git `v2.4.0`; versões ainda mais antigas permanecem no histórico do repositório. Assim, o GitHub mantém uma única aplicação publicada e permite voltar a qualquer versão marcada.
+A versão anterior continua disponível na tag Git `v2.4.1`; versões ainda mais antigas permanecem no histórico do repositório. Assim, o GitHub mantém uma única aplicação publicada e permite voltar a qualquer versão marcada.
 
 ## Funcionalidades
 
@@ -23,6 +23,7 @@ A versão anterior continua disponível na tag Git `v2.4.0`; versões ainda mais
 - salvamento local em banco SQLite no navegador, persistido no IndexedDB do próprio dispositivo;
 - exportação e importação de backup `.sqlite`;
 - cartilha digital completa e imprimível;
+- manual de uso ilustrado em PDF, disponível para download na cartilha digital;
 - manifest e service worker para cache local quando servido por HTTP(S); o site continua funcional sem o service worker.
 
 ## Executar localmente
@@ -71,6 +72,8 @@ As capturas revisadas também ficam versionadas em `screenshots/`: início da jo
 
 - `index.html`: jornada oficial e planejador;
 - `cartilha.html`: cartilha digital;
+- `output/pdf/manual-de-uso-hortalab-escola.pdf`: manual ilustrado para download;
+- `tools/build_manual.py`: gerador reproduzível do manual em PDF;
 - `js/data.js`: cenários, componentes, atividades e eventos;
 - `js/state.js`: estado e regras do produto acadêmico original;
 - `js/rules.js`: regras determinísticas e explicáveis;

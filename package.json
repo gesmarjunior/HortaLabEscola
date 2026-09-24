@@ -1,6 +1,6 @@
 {
   "name": "hortalab-escola",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "private": true,
   "description": "Produto educacional estático para planejamento de hortas escolares agroecológicas.",
   "scripts": {

@@ -606,7 +606,7 @@
 
   async function exportPlan() {
     await persistNow();
-    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.4.1", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
+    downloadBlob(new Blob([JSON.stringify({ app: "HortaLab Escola", version: "2.4.2", exportedAt: new Date().toISOString(), state: clone(state) }, null, 2)], { type: "application/json" }), "hortalab-plano.json");
     announce("Uma cópia do plano foi salva.");
   }
 

@@ -12,8 +12,8 @@ test("a versão oficial contém a jornada orientada de sete etapas", async () =>
   assert.match(html, /sql-wasm\.js/);
   assert.match(html, /js\/local-db\.js/);
   assert.match(html, /js\/rules\.js/);
-  assert.match(html, /css\/planner\.css\?v=2\.4\.1/);
-  assert.match(html, /js\/planner\.js\?v=2\.4\.1/);
+  assert.match(html, /css\/planner\.css\?v=2\.4\.2/);
+  assert.match(html, /js\/planner\.js\?v=2\.4\.2/);
 });
 
 test("a linguagem principal evita termos de programação", async () => {
@@ -54,4 +54,15 @@ test("o banco incorporado é local e a aplicação não referencia recursos remo
 test("a cartilha cobre os tópicos obrigatórios", async () => {
   const html = await readFile(new URL("../cartilha.html", import.meta.url), "utf8");
   for (const id of ["como-usar", "antes", "horta-escolar", "pesquisa-acao", "composicao", "area", "cenarios", "agua", "acessibilidade", "seguranca", "pedagogia", "governanca", "ferias", "compostagem", "checklists", "limites", "glossario", "referencias"]) assert.match(html, new RegExp(`id="${id}"`));
+});
+
+test("o manual em PDF está disponível na área de ajuda e no cache offline", async () => {
+  const html = await readFile(new URL("../cartilha.html", import.meta.url), "utf8");
+  const worker = await readFile(new URL("../service-worker.js", import.meta.url), "utf8");
+  const pdf = await readFile(new URL("../output/pdf/manual-de-uso-hortalab-escola.pdf", import.meta.url));
+  assert.match(html, /href="output\/pdf\/manual-de-uso-hortalab-escola\.pdf"/);
+  assert.match(html, /Baixar manual de uso \(PDF\)/);
+  assert.match(worker, /output\/pdf\/manual-de-uso-hortalab-escola\.pdf/);
+  assert.equal(pdf.subarray(0, 5).toString("ascii"), "%PDF-");
+  assert.ok(pdf.byteLength > 500000, "o manual em PDF parece incompleto");
 });
